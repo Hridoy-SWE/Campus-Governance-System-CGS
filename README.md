@@ -1,21 +1,25 @@
-#Campus Governance System (CGS)
+# Campus Governance System (CGS)
 
 A Secure & Anonymous Governance Platform for Daffodil International University
 
-The Campus Governance System (CGS) is a full-stack web application designed exclusively for Daffodil International University (DIU) to support anonymous issue reporting, feedback management, and institutional accountability. The system emphasizes governance workflows rather than simple complaint collection.
+CGS is a full‑stack web application designed exclusively for Daffodil International University (DIU) to enable anonymous yet trackable issue reporting, feedback submission, and institutional accountability.
 
-✨ Key Highlights
+## Features
+- Anonymous token‑based issue submission and tracking
+- Role‑based access control (Student, Faculty, Department, Admin)
+- Workflow enforcement with status tracking
+- Automatic escalation for overdue issues
+- Analytics dashboards for transparency
+- Secure two‑way anonymous communication
 
-🔒 Anonymous Token-Based Tracking
+## Tech Stack
+- **Backend:** Go (Golang)
+- **Frontend:** HTML5, CSS3, JavaScript, Chart.js
+- **Database:** PostgreSQL
+- **DevOps:** Docker, Docker Compose
+- **Version Control:** Git, GitHub
 
-🧭 Workflow-Driven Issue Lifecycle
-
-⏱️ SLA Monitoring & Rule-Based Escalation
-
-🧑‍💼 Role-Based Access Control
-
-📊 Governance Analytics & Transparency Dashboards
-
-🎯 Project Goal
-
-To provide a secure, transparent, and accountable digital governance framework that improves trust, safety, and decision-making within a university campus.
+## Installation
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/your-username/Campus-Governance-System.git
