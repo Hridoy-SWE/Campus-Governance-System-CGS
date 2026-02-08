@@ -67,5 +67,51 @@ SELECT ' Sample data inserted:' as info;
 SELECT COUNT(*) as token_count FROM tokens;
 SELECT COUNT(*) as issue_count FROM issues;
 SELECT COUNT(*) as department_count FROM departments;
-SELECT * FROM issue_stats;-- Campus Governance System Database
+SELECT * FROM issue_stats;
 -- Initial Schema for DIU
+-- Campus Governance System Database Schema
+CREATE TABLE IF NOT EXISTS tokens (
+    token VARCHAR(20) PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS issues (
+    id SERIAL PRIMARY KEY,
+    token VARCHAR(20),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    priority VARCHAR(20) DEFAULT 'medium',
+    status VARCHAR(50) DEFAULT 'submitted',
+    department VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100)
+);
+
+-- Insert sample data
+INSERT INTO tokens (token) VALUES ('CGS-ABCD1234')
+ON CONFLICT (token) DO NOTHING;
+
+INSERT INTO departments (code, name, email) VALUES
+('IT', 'Information Technology', 'it@diu.edu.bd'),
+('FAC', 'Facilities Management', 'facilities@diu.edu.bd'),
+('ACAD', 'Academic Office', 'academic@diu.edu.bd')
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO issues (token, title, description, category, priority, status, department) VALUES
+('CGS-ABCD1234', 'Broken AC in Room 502', 'AC not working for 2 days', 'facilities', 'high', 'in_progress', 'FAC'),
+('CGS-ABCD1234', 'Slow WiFi in Library', 'Internet speed drops during peak hours', 'it', 'medium', 'submitted', 'IT'),
+('CGS-ABCD1234', 'Parking Space Issue', 'Unauthorized vehicles in faculty parking', 'security', 'high', 'resolved', 'IT')
+ON CONFLICT DO NOTHING;
+
+-- Show confirmation
+SELECT '✅ Database created successfully!';
+SELECT '📊 Tables: tokens, issues, departments';
+SELECT COUNT(*) as issues_count FROM issues;
