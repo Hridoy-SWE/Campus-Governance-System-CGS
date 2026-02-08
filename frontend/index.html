@@ -1,10 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>CGS - DIU</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Governance System | DIU</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Campus Governance System</h1>
-    <p>Daffodil International University</p>
+    <!--  navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-university"></i>
+                <div>
+                    <h1>Campus Governance System</h1>
+                    <p>Daffodil International University</p>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
+                <li><a href="report.html"><i class="fas fa-flag"></i> Report Issue</a></li>
+                <li><a href="track.html"><i class="fas fa-search"></i> Track Issue</a></li>
+                <li><a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
+                <li><a href="department.html" class="dept-btn"><i class="fas fa-building"></i> Department</a></li>
+            </ul>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h2>Transparent. Accountable. Secure.</h2>
+                <h1>Governance Made Effective</h1>
+                <p class="hero-description">
+                    A secure platform for DIU students, faculty, and staff to report campus issues anonymously, 
+                    track resolutions in real-time, and ensure institutional accountability.
+                </p>
+                <div class="hero-buttons">
+                    <a href="report.html" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Report an Issue
+                    </a>
+                    <a href="track.html" class="btn-secondary">
+                        <i class="fas fa-search"></i> Track Issue Status
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="floating-card">
+                    <i class="fas fa-user-shield"></i>
+                    <h3>100% Anonymous</h3>
+                    <p>Your identity is protected</p>
+                </div>
+                <div class="floating-card">
+                    <i class="fas fa-clock"></i>
+                    <h3>24/7 Tracking</h3>
+                    <p>Real-time status updates</p>
+                </div>
+                <div class="floating-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Data-Driven</h3>
+                    <p>Analytics for transparency</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title">Key System Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-secret"></i>
+                </div>
+                <h3>Anonymous Reporting</h3>
+                <p>Submit issues without revealing your identity using secure token-based tracking.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <h3>Workflow Management</h3>
+                <p>Structured workflow: Submitted → Assigned → In Progress → Resolved → Closed.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Auto-Escalation</h3>
+                <p>Automatic escalation for overdue issues based on priority and SLA rules.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3>Analytics Dashboard</h3>
+                <p>Department-wise statistics, trend analysis, and performance metrics.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-item">
+                <h3>15+</h3>
+                <p>DIU Departments</p>
+            </div>
+            <div class="stat-item">
+                <h3>48h</h3>
+                <p>Avg. Response Time</p>
+            </div>
+            <div class="stat-item">
+                <h3>95%</h3>
+                <p>Issues Resolved</p>
+            </div>
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>Anonymous Protection</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3><i class="fas fa-university"></i> Campus Governance System</h3>
+                <p>Software Engineering Capstone Project - SE331</p>
+                <p>Daffodil International University</p>
+            </div>
+            <div class="footer-section">
+                <h4>Team Nexus</h4>
+                <ul>
+                    <li>Md Ashraful Alam Hridoy</li>
+                    <li>Md. Atikujjaman Tutul</li>
+                    <li>Md Sajib</li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Technology Stack</h4>
+                <div class="tech-tags">
+                    <span class="tech-tag">Go</span>
+                    <span class="tech-tag">PostgreSQL</span>
+                    <span class="tech-tag">Docker</span>
+                    <span class="tech-tag">Chart.js</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 Campus Governance System. Capstone Project - SE331(H1). All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
 </body>
 </html>
