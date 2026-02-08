@@ -1,0 +1,2 @@
+-- Campus Governance System Database
+-- Initial Schema for DIU
