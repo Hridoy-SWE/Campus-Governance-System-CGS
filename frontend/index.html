@@ -3,161 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Governance System | DIU</title>
+    <title>DIU Campus Watch · Anonymous Governance Platform</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
-<body>
-    <!--  navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <i class="fas fa-university"></i>
-                <div>
-                    <h1>Campus Governance System</h1>
-                    <p>Daffodil International University</p>
-                </div>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
-                <li><a href="report.html"><i class="fas fa-flag"></i> Report Issue</a></li>
-                <li><a href="track.html"><i class="fas fa-search"></i> Track Issue</a></li>
-                <li><a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a></li>
-                <li><a href="department.html" class="dept-btn"><i class="fas fa-building"></i> Department</a></li>
-            </ul>
-            <button class="mobile-menu-btn">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    </nav>
+<body data-theme="dark">
+    <!-- Progress Bar for Scroll -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
 
-    <!-- hero Section -->
-    <section class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
-                <h2>Transparent. Accountable. Secure.</h2>
-                <h1>Governance Made Effective</h1>
-                <p class="hero-description">
-                    A secure platform for DIU students, faculty, and staff to report campus issues anonymously, 
-                    track resolutions in real-time, and ensure institutional accountability.
-                </p>
-                <div class="hero-buttons">
-                    <a href="report.html" class="btn-primary">
-                        <i class="fas fa-paper-plane"></i> Report an Issue
-                    </a>
-                    <a href="track.html" class="btn-secondary">
-                        <i class="fas fa-search"></i> Track Issue Status
-                    </a>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <h1 class="logo">📋 <span>CAMPUS</span> GOVERNANCE</h1>
+<small class="sub-logo">CGS</small>
+                    <span class="institution">DIU · Campus Governance System (CGS)</span>
+                </div>
+                
+                <div class="header-actions">
+                    <!-- Only Language Toggle (Dark/Light removed) -->
+                    <div class="lang-toggle">
+                        <button class="lang-btn active" data-lang="en">EN</button>
+                        <button class="lang-btn" data-lang="bn">বাংলা</button>
+                    </div>
                 </div>
             </div>
-            <div class="hero-image">
-                <div class="floating-card">
-                    <i class="fas fa-user-shield"></i>
-                    <h3>100% Anonymous</h3>
-                    <p>Your identity is protected</p>
+        </div>
+    </header>
+
+    <!-- Keyboard Shortcuts Hint (REMOVED) -->
+
+    <!-- Emergency Banner -->
+    <div class="emergency-banner">
+        <div class="container">
+            <div class="emergency-content">
+                <span class="emergency-icon">🚨</span>
+                <span class="emergency-text">For immediate threats, contact Campus Security:</span>
+                <a href="tel:+8801712345678" class="emergency-phone">📞 01712-345678</a>
+                <span class="emergency-divider">|</span>
+                <a href="tel:+8801812345678" class="emergency-phone">📞 01812-345678</a>
+                <button class="close-banner" onclick="this.parentElement.parentElement.style.display='none'">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Hero Section -->
+    <section class="hero-stats-section">
+        <div class="container">
+            <div class="cta-block">
+                <h1 class="cta-title">
+                    Speak up. <span>Stay anonymous.</span>
+                </h1>
+                <p class="cta-subtitle">Report campus issues anonymously or with your identity. Track until resolution.</p>
+                
+                <div class="cta-actions">
+                    <button class="primary-btn" id="reportNowBtn">
+                        <span class="btn-icon">📢</span>
+                        Submit Anonymous Report
+                    </button>
+                    <button class="secondary-btn" id="trackBtn">
+                        <span class="btn-icon">🔍</span>
+                        Track Your Token
+                    </button>
                 </div>
-                <div class="floating-card">
-                    <i class="fas fa-clock"></i>
-                    <h3>24/7 Tracking</h3>
-                    <p>Real-time status updates</p>
+            </div>
+
+            <!-- Live Stats Counter -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card" data-count="247">
+                    <span class="stat-value" id="totalReports">247</span>
+                    <span class="stat-label">Total Reports</span>
                 </div>
-                <div class="floating-card">
-                    <i class="fas fa-chart-line"></i>
-                    <h3>Data-Driven</h3>
-                    <p>Analytics for transparency</p>
+                <div class="stat-card" data-count="86">
+                    <span class="stat-value" id="verifiedReports">86</span>
+                    <span class="stat-label">Verified Incidents</span>
+                </div>
+                <div class="stat-card" data-count="112">
+                    <span class="stat-value" id="pendingReviews">112</span>
+                    <span class="stat-label">Under Review</span>
+                </div>
+                <div class="stat-card" data-count="49">
+                    <span class="stat-value" id="resolvedReports">49</span>
+                    <span class="stat-label">Resolved</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Issue Categories -->
+    <section class="categories-bar">
+        <div class="container">
+            <div class="category-chips" id="categoryChips">
+                <button class="chip active" data-cat="all">🔍 All Issues</button>
+                <button class="chip" data-cat="academic">📚 Academic</button>
+                <button class="chip" data-cat="facility">🏫 Facility</button>
+                <button class="chip" data-cat="transport">🚌 Transport</button>
+                <button class="chip" data-cat="security">🛡️ Security</button>
+                <button class="chip" data-cat="harassment">⚖️ Harassment</button>
+                <button class="chip" data-cat="it">💻 IT Services</button>
+                <button class="chip" data-cat="admin">🧾 Administrative</button>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="search-container">
+                <input type="text" id="searchReports" placeholder="🔍 Search reports by keyword, location, or token...">
+                <button class="search-btn" id="searchBtn">Search</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Public Reports Feed -->
+    <section class="public-feed">
+        <div class="container">
+            <div class="feed-header">
+                <h3 class="feed-title">📌 Latest Reports</h3>
+            </div>
+            
+            <div class="reports-list" id="reportsList">
+                <!-- Reports will be dynamically loaded -->
+                <div class="report-item">
+                    <div class="report-header">
+                        <span class="report-category">Academic</span>
+                        <span class="report-status status-suspect">Suspect · Unverified</span>
+                    </div>
+                    <p class="report-excerpt">Irregularities in exam results for CSE 301... authorities unresponsive...</p>
+                    <div class="report-meta">
+                        <span>📍 Central Library, Admin Building</span>
+                        <span>🕒 2 days ago</span>
+                        <span class="report-token-hint">Token: CGS-A7F3...</span>
+                    </div>
+                </div>
+                <div class="report-item">
+                    <div class="report-header">
+                        <span class="report-category">Security</span>
+                        <span class="report-status status-verified">Verified · Action Taken</span>
+                    </div>
+                    <p class="report-excerpt">Unauthorized individuals in women's dormitory at night. Security guard absent...</p>
+                    <div class="report-meta">
+                        <span>📍 Girl's Hostel 3</span>
+                        <span>🕒 5 days ago</span>
+                        <span class="report-token-hint">Token: CGS-D4B9...</span>
+                    </div>
+                </div>
+                <div class="report-item">
+                    <div class="report-header">
+                        <span class="report-category">Facility</span>
+                        <span class="report-status status-pending">Pending Review</span>
+                    </div>
+                    <p class="report-excerpt">Broken bench and fan in Room 401, making classes difficult. Reported multiple times...</p>
+                    <div class="report-meta">
+                        <span>📍 Academic Building A, Room 401</span>
+                        <span>🕒 1 week ago</span>
+                        <span class="report-token-hint">Token: CGS-G2C1...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feed-footer">
+                <button class="load-more-btn" id="loadMoreBtn">Load More Reports ↓</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+        <div class="container">
+            <h3 class="section-title">The Process</h3>
+            <div class="steps-grid">
+                <div class="step-item">
+                    <div class="step-icon-wrapper">
+                        <span class="step-icon">1️⃣</span>
+                    </div>
+                    <h4>Submit Anonymously</h4>
+                    <p>No login required. Your identity is protected.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon-wrapper">
+                        <span class="step-icon">2️⃣</span>
+                    </div>
+                    <h4>Receive Secure Token</h4>
+                    <p>Track, update, or withdraw your report anytime.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon-wrapper">
+                        <span class="step-icon">3️⃣</span>
+                    </div>
+                    <h4>Authority Review</h4>
+                    <p>Department investigates with SLA enforcement.</p>
+                </div>
+                <div class="step-item">
+                    <div class="step-icon-wrapper">
+                        <span class="step-icon">4️⃣</span>
+                    </div>
+                    <h4>Resolution & Feedback</h4>
+                    <p>Outcome published. Rate your experience.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <h2 class="section-title">Key System Features</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-user-secret"></i>
+    <!-- Emergency Contacts Grid -->
+    <section class="emergency-contacts-section">
+        <div class="container">
+            <h3 class="section-title">🚨 Emergency Contacts</h3>
+            <div class="contacts-grid">
+                <div class="contact-card" onclick="window.location.href='tel:+8801712345678'">
+                    <div class="contact-icon">👮</div>
+                    <div class="contact-info">
+                        <h4>Campus Security</h4>
+                        <p>24/7 Emergency Response</p>
+                        <span class="contact-number">01712-345678</span>
+                    </div>
+                    <button class="call-btn">Call Now</button>
                 </div>
-                <h3>Anonymous Reporting</h3>
-                <p>Submit issues without revealing your identity using secure token-based tracking.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-sitemap"></i>
+                <div class="contact-card" onclick="window.location.href='tel:+8801812345678'">
+                    <div class="contact-icon">🏥</div>
+                    <div class="contact-info">
+                        <h4>Medical Center</h4>
+                        <p>First Aid & Emergency</p>
+                        <span class="contact-number">01812-345678</span>
+                    </div>
+                    <button class="call-btn">Call Now</button>
                 </div>
-                <h3>Workflow Management</h3>
-                <p>Structured workflow: Submitted → Assigned → In Progress → Resolved → Closed.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
+                <div class="contact-card" onclick="window.location.href='tel:+8801912345678'">
+                    <div class="contact-icon">👩‍⚖️</div>
+                    <div class="contact-info">
+                        <h4>Women's Support</h4>
+                        <p>Harassment & Safety</p>
+                        <span class="contact-number">01912-345678</span>
+                    </div>
+                    <button class="call-btn">Call Now</button>
                 </div>
-                <h3>Auto-Escalation</h3>
-                <p>Automatic escalation for overdue issues based on priority and SLA rules.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-pie"></i>
+                <div class="contact-card" onclick="window.location.href='tel:+8801612345678'">
+                    <div class="contact-icon">🔥</div>
+                    <div class="contact-info">
+                        <h4>Fire & Safety</h4>
+                        <p>Fire Emergency</p>
+                        <span class="contact-number">01612-345678</span>
+                    </div>
+                    <button class="call-btn">Call Now</button>
                 </div>
-                <h3>Analytics Dashboard</h3>
-                <p>Department-wise statistics, trend analysis, and performance metrics.</p>
             </div>
         </div>
     </section>
 
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="stats-container">
-            <div class="stat-item">
-                <h3>15+</h3>
-                <p>DIU Departments</p>
-            </div>
-            <div class="stat-item">
-                <h3>48h</h3>
-                <p>Avg. Response Time</p>
-            </div>
-            <div class="stat-item">
-                <h3>95%</h3>
-                <p>Issues Resolved</p>
-            </div>
-            <div class="stat-item">
-                <h3>100%</h3>
-                <p>Anonymous Protection</p>
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <div class="testimonial-slider" id="testimonialSlider">
+                <div class="testimonial-item active">
+                    <p>"Reported a security issue anonymously. It was resolved in 2 days!"</p>
+                    <cite>- Anonymous Student</cite>
+                </div>
+                <div class="testimonial-item">
+                    <p>"The token system is brilliant. I could track everything without revealing my identity."</p>
+                    <cite>- Faculty Member</cite>
+                </div>
+                <div class="testimonial-item">
+                    <p>"Finally a platform where our voices are heard without fear."</p>
+                    <cite>- Guardian</cite>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-container">
-            <div class="footer-section">
-                <h3><i class="fas fa-university"></i> Campus Governance System</h3>
-                <p>Software Engineering Capstone Project - SE331</p>
-                <p>Daffodil International University</p>
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About</h4>
+                    <p>DIU Campus Governance System ensures transparent, anonymous, and accountable issue resolution for the entire university community.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#" id="footerReportBtn">Submit Report</a></li>
+                        <li><a href="#" id="footerTrackBtn">Track Report</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <p>Daffodil International University</p>
+                    <p>102/1 Shukrabad, Mirpur Road</p>
+                    <p>Dhaka 1207, Bangladesh</p>
+                </div>
             </div>
-            <div class="footer-section">
-                <h4>Team Nexus</h4>
-                <ul>
-                    <li>Md Ashraful Alam Hridoy</li>
-                    <li>Md. Atikujjaman Tutul</li>
-                    <li>Md Sajib</li>
-                </ul>
+            <div class="footer-bottom">
+                <p>© 2026 DIU Campus Governance System</p>
+                <p class="footer-tagline">Anonymous · Secure · Accountable</p>
             </div>
-            <div class="footer-section">
-                <h4>Technology Stack</h4>
-                <div class="tech-tags">
-                    <span class="tech-tag">Go</span>
-                    <span class="tech-tag">PostgreSQL</span>
-                    <span class="tech-tag">Docker</span>
-                    <span class="tech-tag">Chart.js</span>
+        </div>
+    </footer>
+
+    <!-- MODALS -->
+
+    <!-- Report Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Submit Anonymous Report</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="reportForm">
+                    <div class="form-group">
+                        <label>Category <span class="required">*</span></label>
+                        <select id="reportCategory" required>
+                            <option value="">Select category</option>
+                            <option value="academic">📚 Academic</option>
+                            <option value="facility">🏫 Facility</option>
+                            <option value="transport">🚌 Transport</option>
+                            <option value="security">🛡️ Security</option>
+                            <option value="harassment">⚖️ Harassment</option>
+                            <option value="it">💻 IT Services</option>
+                            <option value="admin">🧾 Administrative</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Title <span class="required">*</span></label>
+                        <input type="text" id="reportTitle" placeholder="Brief description" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Full Description <span class="required">*</span></label>
+                        <textarea id="reportDesc" rows="4" placeholder="Provide detailed information..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="reportLocation" placeholder="Building, room number, or area">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Attach Evidence (Optional)</label>
+                        <input type="file" id="evidence" accept="image/*,.pdf">
+                    </div>
+                    
+                    <div class="form-group anonymous-notice">
+                        <label class="checkbox">
+                            <input type="checkbox" id="anonymousCheck" checked disabled>
+                            <span>✅ You are posting anonymously. Your identity is protected.</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Submit Report →</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Track Modal -->
+    <div class="modal" id="trackModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Track Your Report</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="trackForm">
+                    <div class="form-group">
+                        <label>Enter Tracking Token</label>
+                        <input type="text" id="trackToken" placeholder="e.g., CGS-A7F3-4B9C" required>
+                    </div>
+                    <button type="submit" class="track-submit">🔍 Track Report</button>
+                </form>
+                
+                <div class="saved-tokens" id="savedTokens">
+                    <p class="saved-title">Your recent tokens:</p>
+                    <div id="tokenList"></div>
                 </div>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>© 2026 Campus Governance System. Capstone Project - SE331(H1). All rights reserved.</p>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="modal" id="resultModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Report Status</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="resultContent">
+                <!-- Dynamic content -->
+            </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <script src="js/main.js"></script>
 </body>
