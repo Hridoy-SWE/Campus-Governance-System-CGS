@@ -1,11 +1,133 @@
+-- Campus Governance System - Core Database Schema
+-- Daffodil International University
+
+-- 1. Tracking tokens for anonymous users
+CREATE TABLE tokens (
+    token VARCHAR(20) PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. Main issues table
+CREATE TABLE issues (
+    id SERIAL PRIMARY KEY,
+    token VARCHAR(20) REFERENCES tokens(token),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    priority VARCHAR(20) DEFAULT 'medium',
+    status VARCHAR(50) DEFAULT 'submitted',
+    department VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Departments (for assignment)
+CREATE TABLE departments (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100)
+);
+
+-- 4. Sample data insertion
+-- Insert tracking token
+INSERT INTO tokens (token) VALUES ('CGS-ABCD1234');
+
+-- Insert departments
+INSERT INTO departments (code, name, email) VALUES
+('IT', 'Information Technology', 'it@diu.edu.bd'),
+('FAC', 'Facilities Management', 'facilities@diu.edu.bd'),
+('ACAD', 'Academic Office', 'academic@diu.edu.bd'),
+('SEC', 'Security', 'security@diu.edu.bd'),
+('TRANS', 'Transport', 'transport@diu.edu.bd');
+
+-- Insert sample issues
+INSERT INTO issues (token, title, description, category, priority, status, department) VALUES
+('CGS-ABCD1234', 'Broken AC in Room 502', 'AC not working for 2 days, room temperature is very high', 'facilities', 'high', 'in_progress', 'FAC'),
+('CGS-ABCD1234', 'Slow WiFi in Library', 'Internet speed drops during peak hours (3-6 PM)', 'it', 'medium', 'submitted', 'IT'),
+('CGS-ABCD1234', 'Parking Space Issue', 'Unauthorized vehicles parked in faculty parking area', 'security', 'high', 'resolved', 'SEC');
+
+-- Create a view for quick stats
+CREATE VIEW issue_stats AS
+SELECT 
+    COUNT(*) as total_issues,
+    COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved,
+    COUNT(CASE WHEN status IN ('submitted', 'in_progress') THEN 1 END) as pending,
+    ROUND(AVG(CASE WHEN status = 'resolved' THEN EXTRACT(EPOCH FROM (updated_at - created_at))/3600 END), 1) as avg_hours_to_resolve
+FROM issues;
+
+-- Create index for faster queries
+CREATE INDEX idx_issues_token ON issues(token);
+CREATE INDEX idx_issues_status ON issues(status);
+CREATE INDEX idx_issues_department ON issues(department);
+
+-- Display confirmation
+SELECT ' Database schema created successfully!' as message;
+SELECT ' Sample data inserted:' as info;
+SELECT COUNT(*) as token_count FROM tokens;
+SELECT COUNT(*) as issue_count FROM issues;
+SELECT COUNT(*) as department_count FROM departments;
+SELECT * FROM issue_stats;
+-- Campus Governance System Database Schema
+CREATE TABLE IF NOT EXISTS tokens (
+    token VARCHAR(20) PRIMARY KEY,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS issues (
+    id SERIAL PRIMARY KEY,
+    token VARCHAR(20),
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    priority VARCHAR(20) DEFAULT 'medium',
+    status VARCHAR(50) DEFAULT 'submitted',
+    department VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS departments (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(10) UNIQUE NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100)
+);
+
+-- Insert sample data
+INSERT INTO tokens (token) VALUES ('CGS-ABCD1234')
+ON CONFLICT (token) DO NOTHING;
+
+INSERT INTO departments (code, name, email) VALUES
+('IT', 'Information Technology', 'it@diu.edu.bd'),
+('FAC', 'Facilities Management', 'facilities@diu.edu.bd'),
+('ACAD', 'Academic Office', 'academic@diu.edu.bd')
+ON CONFLICT (code) DO NOTHING;
+
+INSERT INTO issues (token, title, description, category, priority, status, department) VALUES
+('CGS-ABCD1234', 'Broken AC in Room 502', 'AC not working for 2 days', 'facilities', 'high', 'in_progress', 'FAC'),
+('CGS-ABCD1234', 'Slow WiFi in Library', 'Internet speed drops during peak hours', 'it', 'medium', 'submitted', 'IT'),
+('CGS-ABCD1234', 'Parking Space Issue', 'Unauthorized vehicles in faculty parking', 'security', 'high', 'resolved', 'IT')
+ON CONFLICT DO NOTHING;
+
+-- Show confirmation
+SELECT '✅ Database created successfully!';
+SELECT '📊 Tables: tokens, issues, departments';
+SELECT COUNT(*) as issues_count FROM issues;
 -- database/schema.sql
+<<<<<<< HEAD
 -- COMPLETE ENHANCED SCHEMA for Campus Governance System
 -- Includes: Users, Departments, Reports, Tokens, Comments, 
 --           Activity Logs, Stats, Notifications
+=======
+-- SQLite schema for Campus Governance System
+-- UPDATED VERSION - Enhanced with minor improvements
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75
 
 -- Enable foreign keys
 PRAGMA foreign_keys = ON;
 
+<<<<<<< HEAD
 -- =====================================================
 -- 1. DEPARTMENTS TABLE
 -- =====================================================
@@ -70,6 +192,10 @@ INSERT OR IGNORE INTO users (username, email, password_hash, full_name, role, de
 -- 3. TOKENS TABLE (for anonymous tracking)
 -- =====================================================
 CREATE TABLE IF NOT EXISTS tokens (
+=======
+-- Reports table with additional optional fields
+CREATE TABLE reports (
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     token TEXT UNIQUE NOT NULL,
     email TEXT,  -- optional contact email for notifications
@@ -102,6 +228,7 @@ CREATE TABLE IF NOT EXISTS reports (
     priority TEXT DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'critical')),
     status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'assigned', 'in_progress', 'verified', 'resolved', 'closed', 'rejected')),
     evidence_path TEXT,
+<<<<<<< HEAD
     assigned_to INTEGER,  -- user_id of assigned staff
     assigned_at DATETIME,
     due_date DATETIME,
@@ -190,6 +317,22 @@ CREATE INDEX IF NOT EXISTS idx_logs_entity ON activity_logs(entity_type, entity_
 -- 8. STATS TABLE (cached statistics)
 -- =====================================================
 CREATE TABLE IF NOT EXISTS stats (
+=======
+    status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'verified', 'resolved', 'rejected')),
+    admin_notes TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create indexes for better performance
+CREATE INDEX idx_reports_token ON reports(token);
+CREATE INDEX idx_reports_status ON reports(status);
+CREATE INDEX idx_reports_category ON reports(category);
+CREATE INDEX idx_reports_created ON reports(created_at);
+
+-- Stats table with additional metrics
+CREATE TABLE stats (
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     total_reports INTEGER DEFAULT 0,
     pending_reports INTEGER DEFAULT 0,
@@ -220,9 +363,14 @@ BEGIN
         pending_reports = (SELECT COUNT(*) FROM reports WHERE status = 'pending'),
         verified_reports = (SELECT COUNT(*) FROM reports WHERE status = 'verified'),
         resolved_reports = (SELECT COUNT(*) FROM reports WHERE status = 'resolved'),
+<<<<<<< HEAD
         in_progress_reports = (SELECT COUNT(*) FROM reports WHERE status = 'in_progress'),
         critical_reports = (SELECT COUNT(*) FROM reports WHERE priority = 'critical'),
         updated_at = CURRENT_TIMESTAMP
+=======
+        rejected_reports = (SELECT COUNT(*) FROM reports WHERE status = 'rejected'),
+        last_updated = CURRENT_TIMESTAMP
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75
     WHERE id = 1;
 END;
 
@@ -234,8 +382,13 @@ BEGIN
         pending_reports = (SELECT COUNT(*) FROM reports WHERE status = 'pending'),
         verified_reports = (SELECT COUNT(*) FROM reports WHERE status = 'verified'),
         resolved_reports = (SELECT COUNT(*) FROM reports WHERE status = 'resolved'),
+<<<<<<< HEAD
         in_progress_reports = (SELECT COUNT(*) FROM reports WHERE status = 'in_progress'),
         updated_at = CURRENT_TIMESTAMP
+=======
+        rejected_reports = (SELECT COUNT(*) FROM reports WHERE status = 'rejected'),
+        last_updated = CURRENT_TIMESTAMP
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75
     WHERE id = 1;
 END;
 
@@ -244,6 +397,7 @@ CREATE TRIGGER IF NOT EXISTS update_stats_after_user_insert
 AFTER INSERT ON users
 BEGIN
     UPDATE stats SET 
+<<<<<<< HEAD
         total_users = (SELECT COUNT(*) FROM users),
         active_users = (SELECT COUNT(*) FROM users WHERE last_login IS NOT NULL),
         updated_at = CURRENT_TIMESTAMP
@@ -337,3 +491,22 @@ SELECT '📝 Reports: ' || (SELECT COUNT(*) FROM reports) as reports_count;
 SELECT '🔑 Tokens: ' || (SELECT COUNT(*) FROM tokens) as tokens_count;
 SELECT '💬 Comments: ' || (SELECT COUNT(*) FROM comments) as comments_count;
 SELECT '📈 Stats: ' || total_reports || ' total, ' || pending_reports || ' pending, ' || resolved_reports || ' resolved' FROM stats;
+=======
+        total_reports = (SELECT COUNT(*) FROM reports),
+        pending_reports = (SELECT COUNT(*) FROM reports WHERE status = 'pending'),
+        verified_reports = (SELECT COUNT(*) FROM reports WHERE status = 'verified'),
+        resolved_reports = (SELECT COUNT(*) FROM reports WHERE status = 'resolved'),
+        rejected_reports = (SELECT COUNT(*) FROM reports WHERE status = 'rejected'),
+        last_updated = CURRENT_TIMESTAMP
+    WHERE id = 1;
+END;
+
+-- View for easy report summaries (optional, won't affect existing code)
+CREATE VIEW IF NOT EXISTS report_summary AS
+SELECT 
+    status,
+    COUNT(*) as count,
+    DATE(created_at) as report_date
+FROM reports 
+GROUP BY status, DATE(created_at);
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75

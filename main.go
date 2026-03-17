@@ -172,6 +172,7 @@ func updateStats() {
 func handleStats(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+<<<<<<< HEAD
 	var stats Stats
 	err := db.QueryRow(`
 		SELECT 
@@ -206,8 +207,42 @@ func handleStats(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 		"data":    stats,
 	})
-}
+=======
+    var total, verified, pending, resolved int
+    
+    // First check if stats table exists and has data
+    err := db.QueryRow("SELECT total_reports, verified_reports, pending_reports, resolved_reports FROM stats WHERE id = 1").Scan(
+        &total, &verified, &pending, &resolved)
+    
+    if err != nil {
+        // If error, try to create stats table and insert default
+        db.Exec("CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, total_reports INTEGER DEFAULT 0, verified_reports INTEGER DEFAULT 0, pending_reports INTEGER DEFAULT 0, resolved_reports INTEGER DEFAULT 0)")
+        db.Exec("INSERT OR IGNORE INTO stats (id, total_reports, verified_reports, pending_reports, resolved_reports) VALUES (1, 0, 0, 0, 0)")
+        
+        // Try again
+        err = db.QueryRow("SELECT total_reports, verified_reports, pending_reports, resolved_reports FROM stats WHERE id = 1").Scan(
+            &total, &verified, &pending, &resolved)
+        
+        if err != nil {
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "success": false,
+                "message": "Database error: " + err.Error(),
+            })
+            return
+        }
+    }
 
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "success": true,
+        "data": map[string]int{
+            "total_reports":    total,
+            "verified_reports": verified,
+            "pending_reports":  pending,
+            "resolved_reports": resolved,
+        },
+    })
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75
+}
 func handleLatestReports(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -522,6 +557,7 @@ func handleTrackReport(w http.ResponseWriter, r *http.Request) {
 		&report.ID, &report.Token, &report.Category, &report.Title,
 		&report.Description, &report.Location, &report.Status, &createdAt)
 
+<<<<<<< HEAD
 	if err != nil {
 		if err == sql.ErrNoRows {
 			json.NewEncoder(w).Encode(map[string]interface{}{
@@ -544,4 +580,7 @@ func handleTrackReport(w http.ResponseWriter, r *http.Request) {
 		"success": true,
 		"data":    report,
 	})
+=======
+    json.NewEncoder(w).Encode(APIResponse{Success: true, Data: report})
+>>>>>>> eecc6b6d2ecf299c380c2b5e9a6c56046d8fcd75
 }
