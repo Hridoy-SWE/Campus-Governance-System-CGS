@@ -3,38 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIU Campus Watch · Anonymous Governance Platform</title>
+    <title>Campus Governance System (CGS) - DIU</title>
+    
+    <!-- CSS files -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/theme.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body data-theme="dark">
-    <!-- Progress Bar for Scroll -->
     <div class="progress-container">
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <header class="site-header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-area">
-                    <h1 class="logo">📋 <span>CAMPUS</span> GOVERNANCE</h1>
-<small class="sub-logo">CGS</small>
-                    <span class="institution">DIU · Campus Governance System (CGS)</span>
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <!-- Logo and Institution -->
+            <div class="logo-area">
+                <a href="index.html" class="logo-link">
+                    <div class="logo-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="logo-text">
+                        <h1>CAMPUS <span>GOVERNANCE</span></h1>
+                        <span class="institution">Daffodil International University · CGS</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Right side: All controls in one line -->
+            <div class="header-controls">
+                <!-- Theme Toggle -->
+                <div class="theme-toggle">
+                    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                    </button>
                 </div>
-                
-                <div class="header-actions">
-                    <!-- Only Language Toggle (Dark/Light removed) -->
-                    <div class="lang-toggle">
-                        <button class="lang-btn active" data-lang="en">EN</button>
-                        <button class="lang-btn" data-lang="bn">বাংলা</button>
+
+                <!-- Language Toggle -->
+                <div class="lang-toggle">
+                    <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn" data-lang="bn" onclick="setLanguage('bn')">বাংলা</button>
+                </div>
+
+                <!-- Authentication Buttons -->
+                <div class="auth-buttons">
+                    <div id="loggedOutView">
+                        <button class="btn-outline" onclick="openModal('loginModal')">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                        <button class="btn-primary" onclick="openModal('registerModal')">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </button>
+                    </div>
+                    <div id="loggedInView" style="display: none;">
+                        <div class="user-menu-container">
+                            <button class="btn-outline" onclick="toggleUserMenu()">
+                                <i class="fas fa-user-circle"></i>
+                                <span id="userNameDisplay">User</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div id="userMenu" class="user-dropdown">
+                                <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                                <a href="department.html"><i class="fas fa-building"></i> Department Portal</a>
+                                <a href="admin/dashboard.php"><i class="fas fa-cog"></i> Admin Panel</a>
+                                <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
-    <!-- Keyboard Shortcuts Hint (REMOVED) -->
-
-    <!-- Emergency Banner -->
+    <!-- ===== EMERGENCY BANNER ===== -->
     <div class="emergency-banner">
         <div class="container">
             <div class="emergency-content">
@@ -48,207 +92,273 @@
         </div>
     </div>
 
-    <!-- Main Hero Section -->
+    <!-- ===== HERO SECTION with Liquid Glass Design (SINGLE) ===== -->
     <section class="hero-stats-section">
         <div class="container">
-            <div class="cta-block">
-                <h1 class="cta-title">
-                    Speak up. <span>Stay anonymous.</span>
-                </h1>
-                <p class="cta-subtitle">Report campus issues anonymously or with your identity. Track until resolution.</p>
-                
-                <div class="cta-actions">
-                    <button class="primary-btn" id="reportNowBtn">
-                        <span class="btn-icon">📢</span>
-                        Submit Anonymous Report
-                    </button>
-                    <button class="secondary-btn" id="trackBtn">
-                        <span class="btn-icon">🔍</span>
-                        Track Your Token
-                    </button>
+            <!-- Hero Content with Glass Effect -->
+            <div class="hero-glass-wrapper">
+                <div class="cta-block glass-hero">
+                    <h1 class="cta-title">
+                        <span class="cta-text-en">Speak up.</span> <span class="cta-text-en">Stay anonymous.</span>
+                        <span class="cta-text-bn" style="display: none;">সোচ্চার হোন। <span>বেনামে থাকুন।</span></span>
+                    </h1>
+                    <p class="cta-subtitle">
+                        <span class="cta-sub-en">Report campus issues anonymously or with your identity. Track until resolution.</span>
+                        <span class="cta-sub-bn" style="display: none;">বেনামে বা পরিচয় সহ ক্যাম্পাসের সমস্যা রিপোর্ট করুন। সমাধান পর্যন্ত ট্র্যাক করুন।</span>
+                    </p>
+                    
+                    <div class="cta-actions">
+                        <button class="glass-btn glass-btn-primary" onclick="openModal('reportModal')">
+                            <span class="btn-icon">📢</span> 
+                            <span class="btn-text-en">Submit Anonymous Report</span>
+                            <span class="btn-text-bn" style="display: none;">বেনামে রিপোর্ট জমা দিন</span>
+                        </button>
+                        <button class="glass-btn glass-btn-secondary" onclick="window.location.href='track.html'">
+                            <span class="btn-icon">🔍</span> 
+                            <span class="btn-text-en">Track Your Token</span>
+                            <span class="btn-text-bn" style="display: none;">টোকেন ট্র্যাক করুন</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <!-- Live Stats Counter -->
+            <!-- Live Stats Counter (SINGLE) -->
             <div class="stats-grid" id="statsGrid">
-                <div class="stat-card" data-count="247">
-                    <span class="stat-value" id="totalReports">247</span>
-                    <span class="stat-label">Total Reports</span>
+                <div class="stat-card glass-card">
+                    <span class="stat-value" id="totalReports">0</span>
+                    <span class="stat-label stat-label-en">Total Reports</span>
+                    <span class="stat-label stat-label-bn" style="display: none;">মোট রিপোর্ট</span>
+                    <div class="stat-glow"></div>
                 </div>
-                <div class="stat-card" data-count="86">
-                    <span class="stat-value" id="verifiedReports">86</span>
-                    <span class="stat-label">Verified Incidents</span>
+                <div class="stat-card glass-card">
+                    <span class="stat-value" id="verifiedReports">0</span>
+                    <span class="stat-label stat-label-en">Verified Incidents</span>
+                    <span class="stat-label stat-label-bn" style="display: none;">যাচাইকৃত ঘটনা</span>
+                    <div class="stat-glow"></div>
                 </div>
-                <div class="stat-card" data-count="112">
-                    <span class="stat-value" id="pendingReviews">112</span>
-                    <span class="stat-label">Under Review</span>
+                <div class="stat-card glass-card">
+                    <span class="stat-value" id="pendingReports">0</span>
+                    <span class="stat-label stat-label-en">Under Review</span>
+                    <span class="stat-label stat-label-bn" style="display: none;">পর্যালোচনাধীন</span>
+                    <div class="stat-glow"></div>
                 </div>
-                <div class="stat-card" data-count="49">
-                    <span class="stat-value" id="resolvedReports">49</span>
-                    <span class="stat-label">Resolved</span>
+                <div class="stat-card glass-card">
+                    <span class="stat-value" id="resolvedReports">0</span>
+                    <span class="stat-label stat-label-en">Resolved</span>
+                    <span class="stat-label stat-label-bn" style="display: none;">সমাধানকৃত</span>
+                    <div class="stat-glow"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Quick Issue Categories -->
+    <!-- ===== QUICK ISSUE CATEGORIES ===== -->
     <section class="categories-bar">
         <div class="container">
-            <div class="category-chips" id="categoryChips">
-                <button class="chip active" data-cat="all">🔍 All Issues</button>
-                <button class="chip" data-cat="academic">📚 Academic</button>
-                <button class="chip" data-cat="facility">🏫 Facility</button>
-                <button class="chip" data-cat="transport">🚌 Transport</button>
-                <button class="chip" data-cat="security">🛡️ Security</button>
-                <button class="chip" data-cat="harassment">⚖️ Harassment</button>
-                <button class="chip" data-cat="it">💻 IT Services</button>
-                <button class="chip" data-cat="admin">🧾 Administrative</button>
+            <div class="category-chips">
+                <button class="chip active" data-cat="all">
+                    <span class="chip-en">🔍 All Issues</span>
+                    <span class="chip-bn" style="display: none;">🔍 সব সমস্যা</span>
+                </button>
+                <button class="chip" data-cat="academic">
+                    <span class="chip-en">📚 Academic</span>
+                    <span class="chip-bn" style="display: none;">📚 একাডেমিক</span>
+                </button>
+                <button class="chip" data-cat="facility">
+                    <span class="chip-en">🏫 Facility</span>
+                    <span class="chip-bn" style="display: none;">🏫 সুবিধা</span>
+                </button>
+                <button class="chip" data-cat="transport">
+                    <span class="chip-en">🚌 Transport</span>
+                    <span class="chip-bn" style="display: none;">🚌 পরিবহন</span>
+                </button>
+                <button class="chip" data-cat="security">
+                    <span class="chip-en">🛡️ Security</span>
+                    <span class="chip-bn" style="display: none;">🛡️ নিরাপত্তা</span>
+                </button>
+                <button class="chip" data-cat="harassment">
+                    <span class="chip-en">⚖️ Harassment</span>
+                    <span class="chip-bn" style="display: none;">⚖️ হয়রানি</span>
+                </button>
+                <button class="chip" data-cat="it">
+                    <span class="chip-en">💻 IT Services</span>
+                    <span class="chip-bn" style="display: none;">💻 আইটি সেবা</span>
+                </button>
+                <button class="chip" data-cat="admin">
+                    <span class="chip-en">🧾 Administrative</span>
+                    <span class="chip-bn" style="display: none;">🧾 প্রশাসনিক</span>
+                </button>
             </div>
             
             <!-- Search Bar -->
             <div class="search-container">
-                <input type="text" id="searchReports" placeholder="🔍 Search reports by keyword, location, or token...">
-                <button class="search-btn" id="searchBtn">Search</button>
+                <input type="text" id="searchReports" 
+                       placeholder-en="🔍 Search reports by keyword, location, or token..." 
+                       placeholder-bn="🔍 কীওয়ার্ড, অবস্থান বা টোকেন দ্বারা অনুসন্ধান..."
+                       placeholder="🔍 Search reports by keyword, location, or token...">
+                <button class="search-btn">
+                    <span class="search-btn-en">Search</span>
+                    <span class="search-btn-bn" style="display: none;">অনুসন্ধান</span>
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- Public Reports Feed -->
+    <!-- ===== PUBLIC REPORTS FEED ===== -->
     <section class="public-feed">
         <div class="container">
             <div class="feed-header">
-                <h3 class="feed-title">📌 Latest Reports</h3>
+                <h3 class="feed-title">
+                    <span class="feed-title-en">📌 Latest Reports</span>
+                    <span class="feed-title-bn" style="display: none;">📌 সর্বশেষ রিপোর্ট</span>
+                </h3>
             </div>
             
             <div class="reports-list" id="reportsList">
-                <!-- Reports will be dynamically loaded -->
+                <!-- Reports will be loaded dynamically -->
                 <div class="report-item">
                     <div class="report-header">
-                        <span class="report-category">Academic</span>
-                        <span class="report-status status-suspect">Suspect · Unverified</span>
+                        <span class="report-category">Loading...</span>
+                        <span class="report-status">Please wait</span>
                     </div>
-                    <p class="report-excerpt">Irregularities in exam results for CSE 301... authorities unresponsive...</p>
-                    <div class="report-meta">
-                        <span>📍 Central Library, Admin Building</span>
-                        <span>🕒 2 days ago</span>
-                        <span class="report-token-hint">Token: CGS-A7F3...</span>
-                    </div>
-                </div>
-                <div class="report-item">
-                    <div class="report-header">
-                        <span class="report-category">Security</span>
-                        <span class="report-status status-verified">Verified · Action Taken</span>
-                    </div>
-                    <p class="report-excerpt">Unauthorized individuals in women's dormitory at night. Security guard absent...</p>
-                    <div class="report-meta">
-                        <span>📍 Girl's Hostel 3</span>
-                        <span>🕒 5 days ago</span>
-                        <span class="report-token-hint">Token: CGS-D4B9...</span>
-                    </div>
-                </div>
-                <div class="report-item">
-                    <div class="report-header">
-                        <span class="report-category">Facility</span>
-                        <span class="report-status status-pending">Pending Review</span>
-                    </div>
-                    <p class="report-excerpt">Broken bench and fan in Room 401, making classes difficult. Reported multiple times...</p>
-                    <div class="report-meta">
-                        <span>📍 Academic Building A, Room 401</span>
-                        <span>🕒 1 week ago</span>
-                        <span class="report-token-hint">Token: CGS-G2C1...</span>
-                    </div>
+                    <p class="report-excerpt">Fetching latest reports from database...</p>
                 </div>
             </div>
             
             <div class="feed-footer">
-                <button class="load-more-btn" id="loadMoreBtn">Load More Reports ↓</button>
+                <button class="load-more-btn" onclick="window.location.href='dashboard.html'">
+                    <span class="loadmore-en">View All Reports →</span>
+                    <span class="loadmore-bn" style="display: none;">সকল রিপোর্ট দেখুন →</span>
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- How It Works -->
+    <!-- ===== HOW IT WORKS ===== -->
     <section class="how-it-works">
         <div class="container">
-            <h3 class="section-title">The Process</h3>
+            <h3 class="section-title">
+                <span class="section-title-en">The Process</span>
+                <span class="section-title-bn" style="display: none;">পদ্ধতি</span>
+            </h3>
             <div class="steps-grid">
                 <div class="step-item">
-                    <div class="step-icon-wrapper">
-                        <span class="step-icon">1️⃣</span>
-                    </div>
-                    <h4>Submit Anonymously</h4>
-                    <p>No login required. Your identity is protected.</p>
+                    <div class="step-icon">1️⃣</div>
+                    <h4>
+                        <span class="step-title-en">Submit Anonymously</span>
+                        <span class="step-title-bn" style="display: none;">বেনামে জমা দিন</span>
+                    </h4>
+                    <p>
+                        <span class="step-desc-en">No login required. Your identity is protected.</span>
+                        <span class="step-desc-bn" style="display: none;">লগইনের প্রয়োজন নেই। আপনার পরিচয় সুরক্ষিত।</span>
+                    </p>
                 </div>
                 <div class="step-item">
-                    <div class="step-icon-wrapper">
-                        <span class="step-icon">2️⃣</span>
-                    </div>
-                    <h4>Receive Secure Token</h4>
-                    <p>Track, update, or withdraw your report anytime.</p>
+                    <div class="step-icon">2️⃣</div>
+                    <h4>
+                        <span class="step-title-en">Receive Secure Token</span>
+                        <span class="step-title-bn" style="display: none;">নিরাপদ টোকেন গ্রহণ</span>
+                    </h4>
+                    <p>
+                        <span class="step-desc-en">Track, update, or withdraw your report anytime.</span>
+                        <span class="step-desc-bn" style="display: none;">যে কোনো সময় রিপোর্ট ট্র্যাক, আপডেট বা প্রত্যাহার করুন।</span>
+                    </p>
                 </div>
                 <div class="step-item">
-                    <div class="step-icon-wrapper">
-                        <span class="step-icon">3️⃣</span>
-                    </div>
-                    <h4>Authority Review</h4>
-                    <p>Department investigates with SLA enforcement.</p>
+                    <div class="step-icon">3️⃣</div>
+                    <h4>
+                        <span class="step-title-en">Authority Review</span>
+                        <span class="step-title-bn" style="display: none;">কর্তৃপক্ষের পর্যালোচনা</span>
+                    </h4>
+                    <p>
+                        <span class="step-desc-en">Department investigates with SLA enforcement.</span>
+                        <span class="step-desc-bn" style="display: none;">বিভাগ এসএলএ সহ তদন্ত করে।</span>
+                    </p>
                 </div>
                 <div class="step-item">
-                    <div class="step-icon-wrapper">
-                        <span class="step-icon">4️⃣</span>
-                    </div>
-                    <h4>Resolution & Feedback</h4>
-                    <p>Outcome published. Rate your experience.</p>
+                    <div class="step-icon">4️⃣</div>
+                    <h4>
+                        <span class="step-title-en">Resolution & Feedback</span>
+                        <span class="step-title-bn" style="display: none;">সমাধান ও মতামত</span>
+                    </h4>
+                    <p>
+                        <span class="step-desc-en">Outcome published. Rate your experience.</span>
+                        <span class="step-desc-bn" style="display: none;">ফলাফল প্রকাশিত। আপনার অভিজ্ঞতা রেট দিন।</span>
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Emergency Contacts Grid -->
+    <!-- ===== EMERGENCY CONTACTS GRID ===== -->
     <section class="emergency-contacts-section">
         <div class="container">
-            <h3 class="section-title">🚨 Emergency Contacts</h3>
+            <h3 class="section-title">
+                <span class="section-title-en">🚨 Emergency Contacts</span>
+                <span class="section-title-bn" style="display: none;">🚨 জরুরি যোগাযোগ</span>
+            </h3>
             <div class="contacts-grid">
                 <div class="contact-card" onclick="window.location.href='tel:+8801712345678'">
                     <div class="contact-icon">👮</div>
                     <div class="contact-info">
-                        <h4>Campus Security</h4>
-                        <p>24/7 Emergency Response</p>
+                        <h4>
+                            <span class="contact-title-en">Campus Security</span>
+                            <span class="contact-title-bn" style="display: none;">ক্যাম্পাস নিরাপত্তা</span>
+                        </h4>
+                        <p>
+                            <span class="contact-desc-en">24/7 Emergency Response</span>
+                            <span class="contact-desc-bn" style="display: none;">২৪/৭ জরুরি সেবা</span>
+                        </p>
                         <span class="contact-number">01712-345678</span>
                     </div>
-                    <button class="call-btn">Call Now</button>
                 </div>
                 <div class="contact-card" onclick="window.location.href='tel:+8801812345678'">
                     <div class="contact-icon">🏥</div>
                     <div class="contact-info">
-                        <h4>Medical Center</h4>
-                        <p>First Aid & Emergency</p>
+                        <h4>
+                            <span class="contact-title-en">Medical Center</span>
+                            <span class="contact-title-bn" style="display: none;">মেডিকেল সেন্টার</span>
+                        </h4>
+                        <p>
+                            <span class="contact-desc-en">First Aid & Emergency</span>
+                            <span class="contact-desc-bn" style="display: none;">প্রাথমিক চিকিৎসা ও জরুরি সেবা</span>
+                        </p>
                         <span class="contact-number">01812-345678</span>
                     </div>
-                    <button class="call-btn">Call Now</button>
                 </div>
                 <div class="contact-card" onclick="window.location.href='tel:+8801912345678'">
                     <div class="contact-icon">👩‍⚖️</div>
                     <div class="contact-info">
-                        <h4>Women's Support</h4>
-                        <p>Harassment & Safety</p>
+                        <h4>
+                            <span class="contact-title-en">Women's Support</span>
+                            <span class="contact-title-bn" style="display: none;">নারী সহায়তা</span>
+                        </h4>
+                        <p>
+                            <span class="contact-desc-en">Harassment & Safety</span>
+                            <span class="contact-desc-bn" style="display: none;">হয়রানি ও নিরাপত্তা</span>
+                        </p>
                         <span class="contact-number">01912-345678</span>
                     </div>
-                    <button class="call-btn">Call Now</button>
                 </div>
                 <div class="contact-card" onclick="window.location.href='tel:+8801612345678'">
                     <div class="contact-icon">🔥</div>
                     <div class="contact-info">
-                        <h4>Fire & Safety</h4>
-                        <p>Fire Emergency</p>
+                        <h4>
+                            <span class="contact-title-en">Fire & Safety</span>
+                            <span class="contact-title-bn" style="display: none;">অগ্নি নিরাপত্তা</span>
+                        </h4>
+                        <p>
+                            <span class="contact-desc-en">Fire Emergency</span>
+                            <span class="contact-desc-bn" style="display: none;">অগ্নিকাণ্ড জরুরি</span>
+                        </p>
                         <span class="contact-number">01612-345678</span>
                     </div>
-                    <button class="call-btn">Call Now</button>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials -->
+    <!-- ===== TESTIMONIALS ===== -->
     <section class="testimonials">
         <div class="container">
             <div class="testimonial-slider" id="testimonialSlider">
@@ -268,50 +378,136 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- ===== FOOTER ===== -->
     <footer class="site-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h4>About</h4>
-                    <p>DIU Campus Governance System ensures transparent, anonymous, and accountable issue resolution for the entire university community.</p>
+                    <h4>
+                        <span class="footer-about-en">About</span>
+                        <span class="footer-about-bn" style="display: none;">পরিচিতি</span>
+                    </h4>
+                    <p>
+                        <span class="footer-about-text-en">DIU Campus Governance System ensures transparent, anonymous, and accountable issue resolution.</span>
+                        <span class="footer-about-text-bn" style="display: none;">ডিআইইউ ক্যাম্পাস গভর্নেন্স সিস্টেম স্বচ্ছ, বেনামী এবং জবাবদিহিমূলক সমস্যা সমাধান নিশ্চিত করে।</span>
+                    </p>
                 </div>
                 <div class="footer-col">
-                    <h4>Quick Links</h4>
+                    <h4>
+                        <span class="footer-links-en">Quick Links</span>
+                        <span class="footer-links-bn" style="display: none;">দ্রুত লিংক</span>
+                    </h4>
                     <ul>
-                        <li><a href="#" id="footerReportBtn">Submit Report</a></li>
-                        <li><a href="#" id="footerTrackBtn">Track Report</a></li>
+                        <li><a href="report.html">
+                            <span class="footer-report-en">Submit Report</span>
+                            <span class="footer-report-bn" style="display: none;">রিপোর্ট জমা দিন</span>
+                        </a></li>
+                        <li><a href="track.html">
+                            <span class="footer-track-en">Track Report</span>
+                            <span class="footer-track-bn" style="display: none;">রিপোর্ট ট্র্যাক করুন</span>
+                        </a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Contact</h4>
                     <p>Daffodil International University</p>
-                    <p>102/1 Shukrabad, Mirpur Road</p>
-                    <p>Dhaka 1207, Bangladesh</p>
+                    <p>Daffodil Smart City, Savar</p>
+                    <p>Dhaka, Bangladesh</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>© 2026 DIU Campus Governance System</p>
+                <p>© 2026 DIU Campus Governance System | Team Nexus</p>
                 <p class="footer-tagline">Anonymous · Secure · Accountable</p>
             </div>
         </div>
     </footer>
 
-    <!-- MODALS -->
-
-    <!-- Report Modal -->
-    <div class="modal" id="reportModal">
-        <div class="modal-overlay"></div>
+    <!-- ===== MODALS ===== -->
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-overlay" onclick="closeModal('loginModal')"></div>
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Submit Anonymous Report</h3>
-                <button class="modal-close">&times;</button>
+                <h3>Sign In</h3>
+                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="reportForm">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email / Username</label>
+                        <input type="text" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+                <div class="modal-switch">
+                    Don't have an account? <a href="#" onclick="switchModal('loginModal', 'registerModal')">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-overlay" onclick="closeModal('registerModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Account</h3>
+                <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="regRole">
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty</option>
+                            <option value="staff">Staff</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="regConfirmPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+                <div class="modal-switch">
+                    Already have an account? <a href="#" onclick="switchModal('registerModal', 'loginModal')">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Report Modal -->
+    <div class="modal" id="reportModal">
+        <div class="modal-overlay" onclick="closeModal('reportModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Quick Report</h3>
+                <button class="modal-close" onclick="closeModal('reportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="quickReportError" style="color: var(--accent-danger); margin-bottom: 15px; display: none;"></div>
+                <form id="quickReportForm">
                     <div class="form-group">
                         <label>Category <span class="required">*</span></label>
-                        <select id="reportCategory" required>
+                        <select id="quickCategory" required>
                             <option value="">Select category</option>
                             <option value="academic">📚 Academic</option>
                             <option value="facility">🏫 Facility</option>
@@ -322,82 +518,294 @@
                             <option value="admin">🧾 Administrative</option>
                         </select>
                     </div>
-                    
                     <div class="form-group">
                         <label>Title <span class="required">*</span></label>
-                        <input type="text" id="reportTitle" placeholder="Brief description" required>
+                        <input type="text" id="quickTitle" placeholder="Brief summary" required maxlength="100">
                     </div>
-                    
                     <div class="form-group">
-                        <label>Full Description <span class="required">*</span></label>
-                        <textarea id="reportDesc" rows="4" placeholder="Provide detailed information..." required></textarea>
+                        <label>Description <span class="required">*</span></label>
+                        <textarea id="quickDescription" rows="3" placeholder="Brief description..." required></textarea>
                     </div>
-                    
                     <div class="form-group">
                         <label>Location</label>
-                        <input type="text" id="reportLocation" placeholder="Building, room number, or area">
+                        <input type="text" id="quickLocation" placeholder="Where did this happen?">
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Attach Evidence (Optional)</label>
-                        <input type="file" id="evidence" accept="image/*,.pdf">
+                    <div class="anonymous-notice">
+                        <p>✅ You are posting anonymously. Your identity is protected.</p>
                     </div>
-                    
-                    <div class="form-group anonymous-notice">
-                        <label class="checkbox">
-                            <input type="checkbox" id="anonymousCheck" checked disabled>
-                            <span>✅ You are posting anonymously. Your identity is protected.</span>
-                        </label>
-                    </div>
-                    
-                    <button type="submit" class="submit-btn">Submit Report →</button>
+                    <button type="submit" class="submit-btn" id="quickSubmitBtn">Submit Report →</button>
                 </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Track Modal -->
-    <div class="modal" id="trackModal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Track Your Report</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="trackForm">
-                    <div class="form-group">
-                        <label>Enter Tracking Token</label>
-                        <input type="text" id="trackToken" placeholder="e.g., CGS-A7F3-4B9C" required>
-                    </div>
-                    <button type="submit" class="track-submit">🔍 Track Report</button>
-                </form>
-                
-                <div class="saved-tokens" id="savedTokens">
-                    <p class="saved-title">Your recent tokens:</p>
-                    <div id="tokenList"></div>
+                <div class="modal-footer-link">
+                    <a href="report.html">Use full form with evidence upload →</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Result Modal -->
-    <div class="modal" id="resultModal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Report Status</h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body" id="resultContent">
-                <!-- Dynamic content -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Notification Container -->
+    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- JavaScript - SINGLE VERSION (cleaned up) -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        // ===== CONFIGURATION =====
+        const API_BASE = 'http://localhost:8080/api';
+        let isSubmitting = false;
+        let currentLanguage = localStorage.getItem('cgs_language') || 'en';
+
+        // ===== THEME TOGGLE =====
+        window.toggleTheme = function() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.className = 'fas fa-sun';
+                localStorage.setItem('cgs_theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'fas fa-moon';
+                localStorage.setItem('cgs_theme', 'dark');
+            }
+        };
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('cgs_theme') || 'dark';
+        document.body.setAttribute('data-theme', savedTheme);
+        document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+
+        // ===== LANGUAGE TOGGLE =====
+        window.setLanguage = function(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('cgs_language', lang);
+            
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === lang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Show/hide language-specific elements
+            if (lang === 'bn') {
+                // Hide English, show Bengali
+                document.querySelectorAll('[class$="-en"]').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('[class$="-bn"]').forEach(el => el.style.display = 'inline');
+                document.querySelectorAll('.stat-label-en').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.stat-label-bn').forEach(el => el.style.display = 'inline');
+            } else {
+                // Show English, hide Bengali
+                document.querySelectorAll('[class$="-en"]').forEach(el => el.style.display = 'inline');
+                document.querySelectorAll('[class$="-bn"]').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.stat-label-en').forEach(el => el.style.display = 'inline');
+                document.querySelectorAll('.stat-label-bn').forEach(el => el.style.display = 'none');
+            }
+        };
+
+        // ===== STATS FUNCTIONS =====
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('totalReports').textContent = data.data.total_reports || 0;
+                    document.getElementById('verifiedReports').textContent = data.data.verified_reports || 0;
+                    document.getElementById('pendingReports').textContent = data.data.pending_reports || 0;
+                    document.getElementById('resolvedReports').textContent = data.data.resolved_reports || 0;
+                }
+            } catch (error) {
+                console.error('Failed to fetch stats:', error);
+            }
+        }
+
+        // ===== REPORTS FUNCTIONS =====
+        async function fetchLatestReports() {
+            try {
+                const response = await fetch(`${API_BASE}/reports/latest`);
+                const data = await response.json();
+                
+                if (data.success && data.data.length > 0) {
+                    updateReportsList(data.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch reports:', error);
+            }
+        }
+
+        function updateReportsList(reports) {
+            const reportsList = document.getElementById('reportsList');
+            if (!reportsList) return;
+            
+            reportsList.innerHTML = reports.map(report => {
+                let statusClass = 'status-pending';
+                if (report.status === 'verified') statusClass = 'status-verified';
+                else if (report.status === 'resolved') statusClass = 'status-resolved';
+                
+                return `
+                <div class="report-item" onclick="window.location.href='track.html?token=${report.fullToken || report.token}'">
+                    <div class="report-header">
+                        <span class="report-category">${report.category || 'Other'}</span>
+                        <span class="report-status ${statusClass}">${report.status || 'pending'}</span>
+                    </div>
+                    <p class="report-excerpt">${(report.title || '').substring(0, 100)}...</p>
+                    <div class="report-meta">
+                        <span>📍 ${report.location || 'Not specified'}</span>
+                        <span>🕒 ${report.timeAgo || 'recently'}</span>
+                        <span class="report-token-hint">Token: ${report.token || ''}</span>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        // ===== QUICK REPORT SUBMISSION =====
+        async function submitQuickReport(formData) {
+            const submitBtn = document.getElementById('quickSubmitBtn');
+            const errorDiv = document.getElementById('quickReportError');
+            
+            if (isSubmitting) return false;
+            isSubmitting = true;
+            
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = 'Submitting...';
+            submitBtn.disabled = true;
+            if (errorDiv) errorDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE}/report/submit`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(`Report submitted! Token: ${data.data.token}`);
+                    
+                    const tokens = JSON.parse(localStorage.getItem('cgs_tokens') || '[]');
+                    tokens.push(data.data.token);
+                    if (tokens.length > 5) tokens.shift();
+                    localStorage.setItem('cgs_tokens', JSON.stringify(tokens));
+                    
+                    await fetchStats();
+                    await fetchLatestReports();
+                    
+                    closeModal('reportModal');
+                    document.getElementById('quickReportForm').reset();
+                    
+                    return true;
+                } else {
+                    if (errorDiv) {
+                        errorDiv.textContent = data.message || 'Submission failed';
+                        errorDiv.style.display = 'block';
+                    }
+                    return false;
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                if (errorDiv) {
+                    errorDiv.textContent = 'Network error. Is the server running?';
+                    errorDiv.style.display = 'block';
+                }
+                return false;
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                isSubmitting = false;
+            }
+        }
+
+        // ===== MODAL FUNCTIONS =====
+        window.openModal = function(modalId) {
+            document.getElementById(modalId)?.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId)?.classList.remove('show');
+            document.body.style.overflow = '';
+            const errorDiv = document.getElementById('quickReportError');
+            if (errorDiv) errorDiv.style.display = 'none';
+        };
+
+        window.switchModal = function(closeId, openId) {
+            closeModal(closeId);
+            openModal(openId);
+        };
+
+        // ===== USER MENU =====
+        window.toggleUserMenu = function() {
+            const menu = document.getElementById('userMenu');
+            if (menu) {
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            }
+        };
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('userMenu');
+            if (menu && !e.target.closest('.user-menu-container') && menu.style.display === 'block') {
+                menu.style.display = 'none';
+            }
+        });
+
+        // ===== PROGRESS BAR =====
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // ===== EVENT LISTENERS =====
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStats();
+            fetchLatestReports();
+            
+            setInterval(fetchStats, 30000);
+            setInterval(fetchLatestReports, 30000);
+            
+            const quickForm = document.getElementById('quickReportForm');
+            if (quickForm) {
+                quickForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const category = document.getElementById('quickCategory').value;
+                    const title = document.getElementById('quickTitle').value;
+                    const description = document.getElementById('quickDescription').value;
+                    
+                    if (!category || !title || !description) {
+                        alert('Please fill in all required fields');
+                        return;
+                    }
+                    
+                    const formData = new FormData();
+                    formData.append('category', category);
+                    formData.append('title', title);
+                    formData.append('description', description);
+                    formData.append('location', document.getElementById('quickLocation').value || '');
+                    
+                    await submitQuickReport(formData);
+                });
+            }
+            
+            // Set initial language
+            setLanguage(currentLanguage);
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    modal.classList.remove('show');
+                });
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
 </body>
 </html>

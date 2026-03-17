@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Issue - Campus Governance System</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .report-page {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .report-header h1 {
+            font-size: 2.2rem;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        
+        .report-header p {
+            color: var(--text-secondary);
+        }
+        
+        .form-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-card);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-section h2 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+            border-left: 4px solid var(--accent-primary);
+            padding-left: 15px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .evidence-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+        
+        .evidence-upload:hover {
+            border-color: var(--accent-primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+        
+        .evidence-upload i {
+            font-size: 2.5rem;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        
+        .evidence-upload input {
+            display: none;
+        }
+        
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: var(--radius);
+            overflow: hidden;
+        }
+        
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-item .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        
+        .anonymous-badge {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--accent-primary);
+            border-radius: var(--radius);
+            padding: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .anonymous-badge i {
+            color: var(--accent-primary);
+            font-size: 1.5rem;
+        }
+        
+        .submit-section {
+            text-align: center;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+        }
+        
+        .guidelines {
+            background: var(--bg-surface);
+            border-radius: var(--radius-card);
+            padding: 20px;
+            margin-top: 30px;
+        }
+        
+        .guidelines h3 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+        
+        .guidelines ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .guidelines li {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .guidelines li i {
+            color: var(--accent-primary);
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-danger);
+            color: var(--accent-danger);
+            padding: 12px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <a href="index.html" style="text-decoration: none; color: inherit;">
+                        <h1 class="logo">📋 <span>CAMPUS</span> GOVERNANCE</h1>
+                        <small class="sub-logo">CGS</small>
+                        <span class="institution">DIU · Report Issue</span>
+                    </a>
+                </div>
+                
+                <div class="header-actions">
+                    <div class="lang-toggle">
+                        <button class="lang-btn active" data-lang="en">EN</button>
+                        <button class="lang-btn" data-lang="bn">বাংলা</button>
+                    </div>
+                    <div class="auth-buttons">
+                        <div id="loggedOutView">
+                            <button class="btn-outline" onclick="openModal('loginModal')">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </button>
+                            <button class="btn-primary" onclick="openModal('registerModal')">
+                                <i class="fas fa-user-plus"></i> Sign Up
+                            </button>
+                        </div>
+                        <div id="loggedInView" style="display: none;">
+                            <div class="user-menu-container">
+                                <button class="btn-outline" onclick="toggleUserMenu()">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span id="userNameDisplay">User</span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                                <div id="userMenu" class="user-dropdown" style="display: none;">
+                                    <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                                    <a href="department.html"><i class="fas fa-building"></i> Department Portal</a>
+                                    <a href="admin/index.php"><i class="fas fa-cog"></i> Admin Panel</a>
+                                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Emergency Banner -->
+    <div class="emergency-banner">
+        <div class="container">
+            <div class="emergency-content">
+                <span class="emergency-icon">🚨</span>
+                <span class="emergency-text">For immediate threats, contact Campus Security:</span>
+                <a href="tel:+8801712345678" class="emergency-phone">📞 01712-345678</a>
+                <span class="emergency-divider">|</span>
+                <a href="tel:+8801812345678" class="emergency-phone">📞 01812-345678</a>
+                <button class="close-banner" onclick="this.parentElement.parentElement.style.display='none'">✕</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Report Form -->
+    <main class="report-page">
+        <div class="report-header">
+            <h1>Submit an Anonymous Report</h1>
+            <p>Your identity is protected. No login required.</p>
+        </div>
+
+        <!-- Error Message Display -->
+        <div id="errorMessage" class="error-message">
+            <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+        </div>
+
+        <form id="reportForm" enctype="multipart/form-data">
+            <!-- Basic Information -->
+            <div class="form-section">
+                <h2>📋 Basic Information</h2>
+                
+                <div class="form-group">
+                    <label>Category <span class="required">*</span></label>
+                    <select id="category" name="category" required>
+                        <option value="">Select a category</option>
+                        <option value="academic">📚 Academic</option>
+                        <option value="facility">🏫 Facility / Infrastructure</option>
+                        <option value="transport">🚌 Transport</option>
+                        <option value="security">🛡️ Security</option>
+                        <option value="harassment">⚖️ Harassment / Discrimination</option>
+                        <option value="it">💻 IT Services</option>
+                        <option value="admin">🧾 Administrative</option>
+                        <option value="financial">💰 Financial</option>
+                        <option value="other">📌 Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Title <span class="required">*</span></label>
+                    <input type="text" id="title" name="title" placeholder="Brief summary of the issue" required maxlength="255">
+                    <small style="color: var(--text-muted);">Be concise but descriptive</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Description <span class="required">*</span></label>
+                    <textarea id="description" name="description" rows="6" placeholder="Provide detailed information about the incident. Include dates, times, and names if known." required></textarea>
+                    <small style="color: var(--text-muted);">Minimum 20 characters</small>
+                </div>
+            </div>
+
+            <!-- Location & Time -->
+            <div class="form-section">
+                <h2>📍 Location & Time</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Location</label>
+                        <input type="text" id="location" name="location" placeholder="Building, room number, or area">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date of Incident</label>
+                        <input type="date" id="incidentDate" name="incident_date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Approximate Time</label>
+                    <input type="time" id="incidentTime" name="incident_time">
+                </div>
+            </div>
+
+            <!-- Involved Parties -->
+            <div class="form-section">
+                <h2>👥 Involved Parties (Optional)</h2>
+                
+                <div class="form-group">
+                    <label>Names of individuals involved (if known)</label>
+                    <input type="text" id="involvedNames" name="involved_names" placeholder="e.g., John Doe, Jane Smith">
+                </div>
+
+                <div class="form-group">
+                    <label>Department(s) involved</label>
+                    <input type="text" id="involvedDepts" name="involved_depts" placeholder="e.g., IT Department, Facilities">
+                </div>
+            </div>
+
+            <!-- Evidence Upload -->
+            <div class="form-section">
+                <h2>📎 Evidence (Optional)</h2>
+                
+                <div class="evidence-upload" id="evidenceUpload">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click or drag files to upload</p>
+                    <small>Images, PDFs, or documents (Max 10MB each)</small>
+                    <input type="file" id="evidence" name="evidence" accept="image/*,.pdf,.doc,.docx" multiple>
+                </div>
+                
+                <div class="preview-container" id="previewContainer"></div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="form-section">
+                <h2>📧 Contact (Optional)</h2>
+                
+                <div class="form-group">
+                    <label>Email address (for updates)</label>
+                    <input type="email" id="contactEmail" name="contact_email" placeholder="your@email.com">
+                    <small style="color: var(--text-muted);">We'll send status updates. Never shared publicly.</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone number (for urgent contact)</label>
+                    <input type="tel" id="contactPhone" name="contact_phone" placeholder="e.g., 01712-345678">
+                </div>
+            </div>
+
+            <!-- Anonymous Confirmation -->
+            <div class="anonymous-badge">
+                <i class="fas fa-user-secret"></i>
+                <div>
+                    <strong>You are posting anonymously</strong>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">Your identity and personal information are protected. No login required.</p>
+                </div>
+            </div>
+
+            <!-- Terms -->
+            <div class="form-group" style="margin: 20px 0;">
+                <label class="checkbox">
+                    <input type="checkbox" id="terms" required>
+                    <span>I confirm that the information provided is true to the best of my knowledge. I understand that false reporting may have consequences.</span>
+                </label>
+            </div>
+
+            <!-- Submit -->
+            <div class="submit-section">
+                <button type="submit" class="submit-btn" id="submitReport">
+                    <span class="btn-icon">📢</span>
+                    Submit Anonymous Report
+                </button>
+            </div>
+        </form>
+
+        <!-- Guidelines -->
+        <div class="guidelines">
+            <h3>📌 Reporting Guidelines</h3>
+            <ul>
+                <li><i class="fas fa-check-circle"></i> Be specific and factual</li>
+                <li><i class="fas fa-check-circle"></i> Include dates, times, and locations</li>
+                <li><i class="fas fa-check-circle"></i> Upload evidence if available</li>
+                <li><i class="fas fa-check-circle"></i> Your identity is always protected</li>
+                <li><i class="fas fa-check-circle"></i> You'll receive a tracking token immediately</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About</h4>
+                    <p>DIU Campus Governance System ensures transparent, anonymous, and accountable issue resolution.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="track.html">Track Report</a></li>
+                        <li><a href="dashboard.html">Dashboard</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Emergency</h4>
+                    <p>Campus Security: 01712-345678</p>
+                    <p>Medical: 01812-345678</p>
+                    <p>Women's Support: 01912-345678</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2026 DIU Campus Governance System</p>
+                <p class="footer-tagline">Anonymous · Secure · Accountable</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal">
+        <div class="modal-overlay" onclick="closeModal('successModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✅ Report Submitted Successfully</h3>
+                <button class="modal-close" onclick="closeModal('successModal')">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <div style="font-size: 4rem; margin: 20px 0;">🔐</div>
+                <h4>Your Tracking Token</h4>
+                <div style="background: var(--bg-input); padding: 15px; border-radius: 8px; margin: 20px; font-family: monospace; font-size: 1.2rem; word-break: break-all;" id="generatedToken"></div>
+                <p style="color: var(--text-secondary); margin-bottom: 20px;">Save this token to track your report status.</p>
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                    <button class="primary-btn" onclick="window.location.href='track.html'">Track Report</button>
+                    <button class="secondary-btn" onclick="window.location.href='index.html'">Go Home</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal (for auth) -->
+    <div class="modal" id="loginModal">
+        <div class="modal-overlay" onclick="closeModal('loginModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Sign In</h3>
+                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email / Username</label>
+                        <input type="text" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+                <div class="modal-switch">
+                    Don't have an account? <a href="#" onclick="switchModal('loginModal', 'registerModal')">Sign Up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal" id="registerModal">
+        <div class="modal-overlay" onclick="closeModal('registerModal')"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Account</h3>
+                <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="regRole">
+                            <option value="student">Student</option>
+                            <option value="faculty">Faculty</option>
+                            <option value="staff">Staff</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="regConfirmPassword" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Create Account</button>
+                </form>
+                <div class="modal-switch">
+                    Already have an account? <a href="#" onclick="switchModal('registerModal', 'loginModal')">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // API Base URL
+        const API_BASE = 'http://localhost:8080/api';
+
+        // DOM Elements
+        const reportForm = document.getElementById('reportForm');
+        const submitBtn = document.getElementById('submitReport');
+        const successModal = document.getElementById('successModal');
+        const generatedToken = document.getElementById('generatedToken');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        // File Upload Preview
+        document.getElementById('evidenceUpload').addEventListener('click', function() {
+            document.getElementById('evidence').click();
+        });
+
+        document.getElementById('evidence').addEventListener('change', function(e) {
+            const container = document.getElementById('previewContainer');
+            container.innerHTML = '';
+            
+            for (let file of this.files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.createElement('div');
+                        preview.className = 'preview-item';
+                        preview.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <button class="remove" onclick="this.parentElement.remove()">×</button>
+                        `;
+                        container.appendChild(preview);
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Show file icon for non-images
+                    const preview = document.createElement('div');
+                    preview.className = 'preview-item';
+                    preview.innerHTML = `
+                        <div style="background: var(--bg-surface); width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+                            <i class="fas fa-file-pdf" style="font-size:2rem; color:var(--accent-danger);"></i>
+                        </div>
+                        <button class="remove" onclick="this.parentElement.remove()">×</button>
+                    `;
+                    container.appendChild(preview);
+                }
+            }
+        });
+
+        // Form Submission
+        reportForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Hide any previous error
+            errorMessage.classList.remove('show');
+            
+            // Validate terms
+            if (!document.getElementById('terms').checked) {
+                showError('You must confirm that the information is true');
+                return;
+            }
+            
+            // Show loading state
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Submitting...';
+            submitBtn.disabled = true;
+            
+            try {
+                // Create FormData object
+                const formData = new FormData();
+                
+                // Add all form fields
+                formData.append('category', document.getElementById('category').value);
+                formData.append('title', document.getElementById('title').value);
+                formData.append('description', document.getElementById('description').value);
+                formData.append('location', document.getElementById('location').value || '');
+                formData.append('incident_date', document.getElementById('incidentDate').value || '');
+                formData.append('incident_time', document.getElementById('incidentTime').value || '');
+                formData.append('involved_names', document.getElementById('involvedNames').value || '');
+                formData.append('involved_depts', document.getElementById('involvedDepts').value || '');
+                formData.append('contact_email', document.getElementById('contactEmail').value || '');
+                formData.append('contact_phone', document.getElementById('contactPhone').value || '');
+                
+                // Add evidence files
+                const evidenceFiles = document.getElementById('evidence').files;
+                for (let i = 0; i < evidenceFiles.length; i++) {
+                    formData.append('evidence', evidenceFiles[i]);
+                }
+                
+                // Send to backend
+                const response = await fetch(`${API_BASE}/report/submit`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Show success modal with token
+                    generatedToken.textContent = data.data.token;
+                    successModal.classList.add('show');
+                    
+                    // Save token to localStorage
+                    const tokens = JSON.parse(localStorage.getItem('cgs_tokens') || '[]');
+                    tokens.push(data.data.token);
+                    if (tokens.length > 5) tokens.shift();
+                    localStorage.setItem('cgs_tokens', JSON.stringify(tokens));
+                    
+                    // Reset form
+                    reportForm.reset();
+                    document.getElementById('previewContainer').innerHTML = '';
+                    
+                    // Show toast
+                    if (typeof showToast === 'function') {
+                        showToast('Report submitted successfully!', 'success');
+                    }
+                } else {
+                    showError(data.message || 'Failed to submit report');
+                }
+            } catch (error) {
+                console.error('Submission error:', error);
+                showError('Network error. Please check if the server is running.');
+            } finally {
+                // Restore button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        let isSubmitting = false;
+
+document.getElementById('reportForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    isSubmitting = true;
+    
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Submitting...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('http://localhost:8080/api/report/submit', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`Report submitted! Your token: ${data.data.token}`);
+            this.reset();
+            document.getElementById('previewContainer').innerHTML = '';
+            
+            // Refresh homepage stats if we're on that page
+            if (typeof fetchStats === 'function') fetchStats();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (error) {
+        alert('Failed to submit report. Is the server running?');
+        console.error(error);
+    } finally {
+        // Reset button state
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        isSubmitting = false;
+    }
+});
+
+        // Helper Functions
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.add('show');
+            
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 5000);
+        }
+
+        // Modal Functions
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            document.body.style.overflow = '';
+        };
+
+        window.openModal = function(modalId) {
+            document.getElementById(modalId).classList.add('show');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.switchModal = function(closeId, openId) {
+            closeModal(closeId);
+            openModal(openId);
+        };
+
+        // Close modal when clicking overlay
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function() {
+                this.closest('.modal').classList.remove('show');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    modal.classList.remove('show');
+                });
+                document.body.style.overflow = '';
+            }
+        });
+
+        // User Menu Toggle
+        window.toggleUserMenu = function() {
+            const menu = document.getElementById('userMenu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        };
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('userMenu');
+            const btn = e.target.closest('.user-menu-container button');
+            if (!btn && menu && menu.style.display === 'block') {
+                menu.style.display = 'none';
+            }
+        });
+
+        // Progress Bar
+        window.addEventListener('scroll', function() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + '%';
+        });
+
+        // Initialize auth state
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            const isLoggedIn = sessionStorage.getItem('cgs_logged_in') === 'true';
+            const userData = JSON.parse(sessionStorage.getItem('cgs_user') || 'null');
+            
+            if (isLoggedIn && userData) {
+                document.getElementById('loggedOutView').style.display = 'none';
+                document.getElementById('loggedInView').style.display = 'flex';
+                document.getElementById('userNameDisplay').textContent = userData.name.split(' ')[0];
+            }
+        });
+    </script>
+    <script>
+    document.getElementById('reportForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch('http://localhost:8080/api/report/submit', {
+                method: 'POST',
+                body: formData
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`Report submitted! Your token: ${data.data.token}`);
+                this.reset();
+                
+                // Refresh stats on homepage if we're there
+                if (typeof fetchStats === 'function') fetchStats();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        } catch (error) {
+            alert('Failed to submit report. Is the server running?');
+        }
+    });
+</script>
+</body>
+</html>
