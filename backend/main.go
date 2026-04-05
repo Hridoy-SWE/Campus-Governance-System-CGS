@@ -33,6 +33,12 @@ type Stats struct {
 	ResolvedReports int `json:"resolved_reports"`
 }
 
+type Response struct {
+	Success bool        `json:"success"`
+	Message string      `json:"message,omitempty"`
+	Data    interface{} `json:"data,omitempty"`
+}
+
 var db *sql.DB
 
 func main() {
@@ -43,7 +49,9 @@ func main() {
 	defer db.Close()
 
 	// Create uploads directory if not exists
-	os.MkdirAll("./uploads", 0755)
+	if err := os.MkdirAll("./uploads", 0755); err != nil {
+		log.Printf("⚠️ Warning: Could not create uploads directory: %v", err)
+	}
 
 	// Serve static files (frontend)
 	http.Handle("/", http.FileServer(http.Dir("./frontend")))
@@ -55,18 +63,45 @@ func main() {
 	http.HandleFunc("/api/report/track", enableCORS(handleTrackReport))
 	http.HandleFunc("/api/reports/all", enableCORS(handleAllReports))
 
-	fmt.Println("🚀 Server running on http://localhost:8080")
-	fmt.Println("📁 Database: ./database/campus.db")
-	fmt.Println("📂 Frontend: ./frontend/")
+	// Health check endpoint
+	http.HandleFunc("/health", enableCORS(handleHealth))
+
+	fmt.Println("========================================")
+	fmt.Println("🚀 Campus Governance System Server")
+	fmt.Println("========================================")
+	fmt.Printf("📍 Server URL: http://localhost:8080\n")
+	fmt.Printf("📁 Database: ./database/campus.db\n")
+	fmt.Printf("📂 Frontend: ./frontend/\n")
+	fmt.Printf("🔄 API Endpoints:\n")
+	fmt.Printf("   GET  /api/stats\n")
+	fmt.Printf("   GET  /api/reports/latest\n")
+	fmt.Printf("   GET  /api/reports/all\n")
+	fmt.Printf("   POST /api/report/submit\n")
+	fmt.Printf("   GET  /api/report/track?token=XXX\n")
+	fmt.Println("========================================")
+	
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+// Health check handler
+func handleHealth(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(Response{
+		Success: true,
+		Message: "Server is running",
+		Data: map[string]interface{}{
+			"status": "healthy",
+			"time":   time.Now().Format(time.RFC3339),
+		},
+	})
 }
 
 // CORS middleware
 func enableCORS(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
@@ -91,6 +126,11 @@ func initDB() error {
 	if err != nil {
 		return fmt.Errorf("failed to open database: %v", err)
 	}
+
+	// Configure connection pool
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(5)
+	db.SetConnMaxLifetime(5 * time.Minute)
 
 	// Test connection
 	if err = db.Ping(); err != nil {
@@ -132,18 +172,38 @@ func initDB() error {
 	var statsCount int
 	err = db.QueryRow("SELECT count(*) FROM stats").Scan(&statsCount)
 	if err != nil {
-		return fmt.Errorf("failed to check stats: %v", err)
+		log.Println("⚠️ Stats table not found, creating...")
+		_, err = db.Exec("CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY, total_reports INTEGER DEFAULT 0, verified_reports INTEGER DEFAULT 0, pending_reports INTEGER DEFAULT 0, resolved_reports INTEGER DEFAULT 0)")
+		if err != nil {
+			return fmt.Errorf("failed to create stats table: %v", err)
+		}
+		statsCount = 0
 	}
 
 	if statsCount == 0 {
-		_, err = db.Exec("INSERT INTO stats (total_reports, verified_reports, pending_reports, resolved_reports) VALUES (0, 0, 0, 0)")
+		_, err = db.Exec("INSERT OR IGNORE INTO stats (id, total_reports, verified_reports, pending_reports, resolved_reports) VALUES (1, 0, 0, 0, 0)")
 		if err != nil {
 			return fmt.Errorf("failed to insert stats: %v", err)
 		}
 	}
 
+	// Update stats with current data
+	updateStats()
+
 	log.Println("✅ Database ready")
 	return nil
+}
+
+// Update stats helper
+func updateStats() {
+	var total, verified, pending, resolved int
+	db.QueryRow("SELECT COUNT(*) FROM reports").Scan(&total)
+	db.QueryRow("SELECT COUNT(*) FROM reports WHERE status = 'verified'").Scan(&verified)
+	db.QueryRow("SELECT COUNT(*) FROM reports WHERE status = 'pending'").Scan(&pending)
+	db.QueryRow("SELECT COUNT(*) FROM reports WHERE status = 'resolved'").Scan(&resolved)
+
+	db.Exec("UPDATE stats SET total_reports=?, verified_reports=?, pending_reports=?, resolved_reports=? WHERE id=1",
+		total, verified, pending, resolved)
 }
 
 func handleStats(w http.ResponseWriter, r *http.Request) {
@@ -160,6 +220,7 @@ func handleStats(w http.ResponseWriter, r *http.Request) {
 		&stats.TotalReports, &stats.VerifiedReports, &stats.PendingReports, &stats.ResolvedReports)
 
 	if err != nil {
+		log.Printf("⚠️ Stats query error: %v, calculating on the fly", err)
 		// If stats not found, calculate on the fly
 		var total, verified, pending, resolved int
 		db.QueryRow("SELECT COUNT(*) FROM reports").Scan(&total)
@@ -179,9 +240,9 @@ func handleStats(w http.ResponseWriter, r *http.Request) {
 			total, verified, pending, resolved)
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    stats,
+	json.NewEncoder(w).Encode(Response{
+		Success: true,
+		Data:    stats,
 	})
 }
 
@@ -194,9 +255,9 @@ func handleLatestReports(w http.ResponseWriter, r *http.Request) {
 		ORDER BY created_at DESC 
 		LIMIT 10`)
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": "Failed to fetch reports",
+		json.NewEncoder(w).Encode(Response{
+			Success: false,
+			Message: "Failed to fetch reports",
 		})
 		return
 	}
@@ -210,9 +271,19 @@ func handleLatestReports(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		// Format date
-		created, _ := time.Parse("2006-01-02 15:04:05", created_at)
-		timeAgo := formatTimeAgo(created)
+		// Parse date properly
+		var timeAgo string
+		parsedTime, err := time.Parse("2006-01-02 15:04:05", created_at)
+		if err != nil {
+			parsedTime, err = time.Parse(time.RFC3339, created_at)
+			if err != nil {
+				timeAgo = "recently"
+			} else {
+				timeAgo = formatTimeAgo(parsedTime)
+			}
+		} else {
+			timeAgo = formatTimeAgo(parsedTime)
+		}
 
 		// Mask token for privacy
 		parts := strings.Split(token, "-")
@@ -233,9 +304,9 @@ func handleLatestReports(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    reports,
+	json.NewEncoder(w).Encode(Response{
+		Success: true,
+		Data:    reports,
 	})
 }
 
@@ -243,13 +314,13 @@ func handleAllReports(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	rows, err := db.Query(`
-		SELECT token, category, title, location, status, created_at 
+		SELECT id, token, category, title, description, location, status, created_at 
 		FROM reports 
 		ORDER BY created_at DESC`)
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": "Failed to fetch reports",
+		json.NewEncoder(w).Encode(Response{
+			Success: false,
+			Message: "Failed to fetch reports: " + err.Error(),
 		})
 		return
 	}
@@ -257,22 +328,28 @@ func handleAllReports(w http.ResponseWriter, r *http.Request) {
 
 	var reports []map[string]interface{}
 	for rows.Next() {
-		var token, category, title, location, status, created_at string
-		rows.Scan(&token, &category, &title, &location, &status, &created_at)
+		var id int
+		var token, category, title, description, location, status, created_at string
+		err := rows.Scan(&id, &token, &category, &title, &description, &location, &status, &created_at)
+		if err != nil {
+			continue
+		}
 
 		reports = append(reports, map[string]interface{}{
-			"token":     token,
-			"category":  category,
-			"title":     title,
-			"location":  location,
-			"status":    status,
-			"createdAt": created_at,
+			"id":          id,
+			"token":       token,
+			"category":    category,
+			"title":       title,
+			"description": description,
+			"location":    location,
+			"status":      status,
+			"createdAt":   created_at,
 		})
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    reports,
+	json.NewEncoder(w).Encode(Response{
+		Success: true,
+		Data:    reports,
 	})
 }
 
@@ -280,34 +357,34 @@ func handleSubmitReport(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if r.Method != "POST" {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": "Method not allowed",
+		json.NewEncoder(w).Encode(Response{
+			Success: false,
+			Message: "Method not allowed",
 		})
 		return
 	}
 
-	// Parse form data
-	if err := r.ParseMultipartForm(10 << 20); err != nil { // 10 MB max
+	// Parse form data (max 10 MB)
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		if err := r.ParseForm(); err != nil {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"message": "Failed to parse form",
+			json.NewEncoder(w).Encode(Response{
+				Success: false,
+				Message: "Failed to parse form",
 			})
 			return
 		}
 	}
 
-	category := r.FormValue("category")
-	title := r.FormValue("title")
-	description := r.FormValue("description")
-	location := r.FormValue("location")
+	category := strings.TrimSpace(r.FormValue("category"))
+	title := strings.TrimSpace(r.FormValue("title"))
+	description := strings.TrimSpace(r.FormValue("description"))
+	location := strings.TrimSpace(r.FormValue("location"))
 
 	// Validation
 	if category == "" || title == "" || description == "" {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": "Category, title and description are required",
+		json.NewEncoder(w).Encode(Response{
+			Success: false,
+			Message: "Category, title and description are required",
 		})
 		return
 	}
@@ -326,7 +403,7 @@ func handleSubmitReport(w http.ResponseWriter, r *http.Request) {
 		os.MkdirAll(evidenceDir, 0755)
 
 		// Save file with timestamp to avoid duplicates
-		filename := fmt.Sprintf("%d_%s", time.Now().Unix(), header.Filename)
+		filename := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(header.Filename))
 		evidencePath = filepath.Join("uploads/evidence", filename)
 		fullPath := filepath.Join(".", evidencePath)
 
@@ -335,6 +412,7 @@ func handleSubmitReport(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			defer out.Close()
 			io.Copy(out, file)
+			log.Printf("📎 File uploaded: %s", filename)
 		}
 	}
 
@@ -344,17 +422,22 @@ func handleSubmitReport(w http.ResponseWriter, r *http.Request) {
 		token, category, title, description, location, evidencePath)
 
 	if err != nil {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": "Failed to save report: " + err.Error(),
+		json.NewEncoder(w).Encode(Response{
+			Success: false,
+			Message: "Failed to save report: " + err.Error(),
 		})
 		return
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"message": "Report submitted successfully",
-		"data": map[string]string{
+	// Update stats after successful insert
+	updateStats()
+
+	log.Printf("📝 New report submitted: %s - %s", token, title)
+
+	json.NewEncoder(w).Encode(Response{
+		Success: true,
+		Message: "Report submitted successfully",
+		Data: map[string]string{
 			"token": token,
 		},
 	})
@@ -365,9 +448,9 @@ func handleTrackReport(w http.ResponseWriter, r *http.Request) {
 
 	token := r.URL.Query().Get("token")
 	if token == "" {
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"success": false,
-			"message": "Token is required",
+		json.NewEncoder(w).Encode(Response{
+			Success: false,
+			Message: "Token is required",
 		})
 		return
 	}
@@ -384,14 +467,14 @@ func handleTrackReport(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"message": "Report not found with token: " + token,
+			json.NewEncoder(w).Encode(Response{
+				Success: false,
+				Message: "Report not found with token: " + token,
 			})
 		} else {
-			json.NewEncoder(w).Encode(map[string]interface{}{
-				"success": false,
-				"message": "Database error: " + err.Error(),
+			json.NewEncoder(w).Encode(Response{
+				Success: false,
+				Message: "Database error: " + err.Error(),
 			})
 		}
 		return
@@ -400,38 +483,74 @@ func handleTrackReport(w http.ResponseWriter, r *http.Request) {
 	report.CreatedAt = createdAt
 	_ = evidencePath
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
-		"success": true,
-		"data":    report,
+	json.NewEncoder(w).Encode(Response{
+		Success: true,
+		Data:    report,
 	})
 }
 
 func generateToken() string {
+	// Use timestamp + random + nanosecond for uniqueness
 	timestamp := time.Now().Format("150405")
 	random := strings.ToUpper(fmt.Sprintf("%04d", time.Now().Nanosecond()%10000))
-	return fmt.Sprintf("CGS-%s-%s", timestamp, random)
+	unique := fmt.Sprintf("%d", time.Now().UnixNano())[10:]
+	return fmt.Sprintf("CGS-%s-%s%s", timestamp, random, unique)
 }
 
 func formatTimeAgo(t time.Time) string {
-	duration := time.Since(t)
+	now := time.Now()
+	duration := now.Sub(t)
 
-	if duration < time.Minute {
-		return "just now"
-	} else if duration < time.Hour {
+	switch {
+	case duration < time.Minute:
+		seconds := int(duration.Seconds())
+		if seconds <= 1 {
+			return "just now"
+		}
+		return fmt.Sprintf("%d seconds ago", seconds)
+
+	case duration < time.Hour:
 		minutes := int(duration.Minutes())
-		return fmt.Sprintf("%d minute%s ago", minutes, plural(minutes))
-	} else if duration < 24*time.Hour {
-		hours := int(duration.Hours())
-		return fmt.Sprintf("%d hour%s ago", hours, plural(hours))
-	} else {
-		days := int(duration.Hours() / 24)
-		return fmt.Sprintf("%d day%s ago", days, plural(days))
-	}
-}
+		if minutes == 1 {
+			return "1 minute ago"
+		}
+		return fmt.Sprintf("%d minutes ago", minutes)
 
-func plural(n int) string {
-	if n == 1 {
-		return ""
+	case duration < 24*time.Hour:
+		hours := int(duration.Hours())
+		if hours == 1 {
+			return "1 hour ago"
+		}
+		return fmt.Sprintf("%d hours ago", hours)
+
+	case duration < 30*24*time.Hour:
+		days := int(duration.Hours() / 24)
+		if days == 1 {
+			return "yesterday"
+		} else if days < 7 {
+			return fmt.Sprintf("%d days ago", days)
+		} else if days < 30 {
+			weeks := days / 7
+			if weeks == 1 {
+				return "1 week ago"
+			}
+			return fmt.Sprintf("%d weeks ago", weeks)
+		}
+
+	case duration < 365*24*time.Hour:
+		months := int(duration.Hours() / 24 / 30)
+		if months == 1 {
+			return "1 month ago"
+		}
+		return fmt.Sprintf("%d months ago", months)
+
+	default:
+		years := int(duration.Hours() / 24 / 365)
+		if years == 1 {
+			return "1 year ago"
+		}
+		return fmt.Sprintf("%d years ago", years)
 	}
-	return "s"
+
+	return "recently"
 }
