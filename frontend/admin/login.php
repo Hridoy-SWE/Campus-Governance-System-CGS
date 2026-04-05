@@ -17,11 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Demo credentials
     if ($username === 'admin' && $password === 'admin123') {
         $_SESSION['admin_logged_in'] = true;
-        $_SESSION['user_role'] = 'admin';
         $_SESSION['user_name'] = 'Admin User';
         $_SESSION['user_id'] = 1;
+        $_SESSION['user_role'] = 'admin';
         
-        // IMPORTANT: Redirect to dashboard
         header('Location: dashboard.php');
         exit;
     } else {
@@ -35,164 +34,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - CGS</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-/* Add these enhanced styles to login.php */
-.login-container {
-    background: rgba(20, 20, 40, 0.7);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    animation: fadeInUp 0.5s ease;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.login-header h1 {
-    background: linear-gradient(135deg, #fff, #a5b4fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-size: 2.2rem;
-}
-
-.form-group input {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
-    transition: all 0.3s ease;
-}
-
-.form-group input:focus {
-    border-color: #8b5cf6;
-    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-    outline: none;
-}
-
-.submit-btn {
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
-    border: none;
-    position: relative;
-    overflow: hidden;
-}
-
-.submit-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transition: left 0.5s ease;
-}
-
-.submit-btn:hover::before {
-    left: 100%;
-}
-
-.demo-info {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.demo-info code {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 4px 8px;
-    border-radius: 6px;
-    color: #fbbf24;
-}
-
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            background: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .login-container {
-            max-width: 400px;
-            width: 90%;
+            background: white;
             padding: 40px;
-            background: var(--bg-card);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--border-color);
-            box-shadow: var(--shadow-modal);
+            border-radius: 20px;
+            width: 400px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
-        .login-header {
+        .login-container h1 {
             text-align: center;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+        .login-container p {
+            text-align: center;
+            color: #64748b;
             margin-bottom: 30px;
         }
-        .login-header h1 {
-            color: var(--accent-primary);
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
-        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #475569; font-weight: 500; }
         .form-group input {
             width: 100%;
             padding: 12px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            color: var(--text-primary);
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
         }
-        .submit-btn {
+        button {
             width: 100%;
-            padding: 14px;
-            background: var(--accent-primary);
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            border-radius: var(--radius);
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s ease;
         }
-        .submit-btn:hover {
-            background: var(--accent-primary-dark);
-        }
-        .error {
-            color: var(--accent-danger);
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: rgba(239, 68, 68, 0.1);
-            border-radius: var(--radius);
-        }
-        .demo-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: var(--bg-surface);
-            border-radius: var(--radius);
-            text-align: center;
-            color: var(--text-secondary);
-        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102,126,234,0.4); }
+        .error { background: #fee2e2; color: #dc2626; padding: 10px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+        .back-link { text-align: center; margin-top: 20px; }
+        .back-link a { color: #64748b; text-decoration: none; font-size: 0.9rem; }
+        .back-link a:hover { color: #667eea; }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <div class="login-header">
-            <h1>🏛️ CGS Admin</h1>
-            <p>Campus Governance System</p>
-        </div>
+        <h1>🏛️ CGS Admin</h1>
+        <p>Campus Governance System</p>
         
         <?php if ($error): ?>
             <div class="error"><?= htmlspecialchars($error) ?></div>
@@ -207,13 +108,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label>Password</label>
                 <input type="password" name="password" required>
             </div>
-            <button type="submit" class="submit-btn">Login</button>
+            <button type="submit">Login to Dashboard</button>
         </form>
-        
-        <div class="demo-info">
-            <p><strong>Demo Credentials:</strong></p>
-            <p>Username: <code>admin</code></p>
-            <p>Password: <code>admin123</code></p>
+        <div class="back-link">
+            <a href="../index.html">← Back to Homepage</a>
         </div>
     </div>
 </body>
