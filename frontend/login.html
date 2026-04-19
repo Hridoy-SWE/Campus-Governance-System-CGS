@@ -1,93 +1,437 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login - Campus Governance System</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/responsive.css">
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <style>
+        .login-page {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+        }
+
+        .login-shell {
+            width: min(1120px, 100%);
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .login-showcase,
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            box-shadow: var(--shadow-xl), var(--shadow-inner);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-showcase::before,
+        .login-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 28%);
+            pointer-events: none;
+        }
+
+        .login-showcase,
+        .login-card {
+            padding: 34px;
+        }
+
+        .showcase-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-height: 38px;
+            padding: 0 14px;
+            border-radius: 999px;
+            background: rgba(98, 227, 255, 0.10);
+            border: 1px solid rgba(98, 227, 255, 0.18);
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .showcase-title {
+            font-size: clamp(2.1rem, 4vw, 3.3rem);
+            line-height: 1.02;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .showcase-title span {
+            background: linear-gradient(135deg, #ffffff 0%, #dbe7ff 42%, #94ebff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body[data-theme="light"] .showcase-title span {
+            background: linear-gradient(135deg, #1f2937 0%, #3563e9 48%, #1995c5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .showcase-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.7;
+            max-width: 60ch;
+        }
+
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 26px;
+        }
+
+        .showcase-feature {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .showcase-feature i {
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            font-size: 1.05rem;
+        }
+
+        .showcase-feature h4 {
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .showcase-feature p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.55;
+        }
+
+        .login-card-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .login-logo {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 14px;
+            border-radius: 22px;
+            display: grid;
+            place-items: center;
+            background: var(--gradient-primary);
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: var(--glow-primary);
+        }
+
+        .login-card-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .login-card-header p {
+            color: var(--text-secondary);
+        }
+
+        .login-helper-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+            margin-bottom: 20px;
+        }
+
+        .remember-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .remember-wrap input {
+            width: 16px;
+            min-height: 16px;
+        }
+
+        .inline-link {
+            color: var(--accent-primary);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .alert-box {
+            display: none;
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 16px;
+            font-weight: 600;
+        }
+
+        .alert-box.error {
+            display: block;
+            background: rgba(255, 127, 143, 0.12);
+            border: 1px solid rgba(255, 127, 143, 0.18);
+            color: #ffd7df;
+        }
+
+        body[data-theme="light"] .alert-box.error {
+            background: #f7e1e4;
+            border-color: #ebc5ca;
+            color: #b53e47;
+        }
+
+        .alert-box.success {
+            display: block;
+            background: rgba(66, 220, 163, 0.12);
+            border: 1px solid rgba(66, 220, 163, 0.18);
+            color: #d2ffef;
+        }
+
+        body[data-theme="light"] .alert-box.success {
+            background: #def2ea;
+            border-color: #c2e3d7;
+            color: #0f8160;
+        }
+
+        .login-footer {
+            margin-top: 22px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        body[data-theme="light"] .login-footer {
+            border-top-color: rgba(198,205,216,0.86);
+        }
+
+        @media (max-width: 980px) {
+            .login-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .login-page {
+                padding: 12px;
+            }
+
+            .login-showcase,
+            .login-card {
+                padding: 22px;
+            }
+
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .login-helper-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
-<body style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;">
-        <div class="card" style="max-width: 400px; width: 100%;">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <div class="logo" style="font-size: 2rem;">CGS</div>
-                <p style="color: var(--gray); margin-top: 0.5rem;">Campus Governance System</p>
-            </div>
-
-            <div id="alertContainer"></div>
-
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" required 
-                           placeholder="Enter your email">
+<body data-theme="dark">
+    <div class="login-page">
+        <div class="login-shell">
+            <section class="login-showcase">
+                <div class="showcase-badge">
+                    <i class="fas fa-shield-halved"></i>
+                    Secure access
                 </div>
 
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" required 
-                           placeholder="Enter your password">
-                </div>
-
-                <div class="form-group" style="text-align: right;">
-                    <a href="#" style="color: var(--primary); text-decoration: none;">Forgot Password?</a>
-                </div>
-
-                <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginBtn">
-                    Login
-                </button>
-            </form>
-
-            <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e0e0e0;">
-                <p style="color: var(--gray);">Don't have an account? 
-                    <a href="#" style="color: var(--primary); text-decoration: none;">Contact Admin</a>
+                <h2 class="showcase-title"><span>Access governance tools with the right role.</span></h2>
+                <p class="showcase-text">
+                    Sign in to continue to analytics, departmental workflows, or role-specific governance dashboards. Access should remain restricted, traceable, and properly routed by user role.
                 </p>
-                <p style="margin-top: 1rem;">
-                    <a href="index.html" style="color: var(--gray); text-decoration: none;">← Back to Home</a>
-                </p>
-            </div>
+
+                <div class="showcase-grid">
+                    <div class="showcase-feature">
+                        <i class="fas fa-chart-pie"></i>
+                        <h4>Analytics access</h4>
+                        <p>View live reporting trends, category distribution, and issue-response summaries.</p>
+                    </div>
+                    <div class="showcase-feature">
+                        <i class="fas fa-building-shield"></i>
+                        <h4>Department workflows</h4>
+                        <p>Faculty and admin roles can inspect incoming cases and act on assigned issues.</p>
+                    </div>
+                    <div class="showcase-feature">
+                        <i class="fas fa-user-lock"></i>
+                        <h4>Role-aware routing</h4>
+                        <p>Users are redirected to the appropriate destination after sign-in.</p>
+                    </div>
+                    <div class="showcase-feature">
+                        <i class="fas fa-clock-rotate-left"></i>
+                        <h4>Session continuity</h4>
+                        <p>Remembered sessions keep access smoother across pages in the current browser.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="login-card">
+                <div class="login-card-header">
+                    <div class="login-logo">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <h1>Sign in</h1>
+                    <p>Campus Governance System</p>
+                </div>
+
+                <div class="alert-box" id="alertBox"></div>
+
+                <form id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="email">Email / Username</label>
+                        <input type="text" id="email" class="form-control" placeholder="Enter your email or username" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="Enter your password" required />
+                    </div>
+
+                    <div class="login-helper-row">
+                        <label class="remember-wrap">
+                            <input type="checkbox" id="rememberMe" checked />
+                            <span>Remember me on this device</span>
+                        </label>
+
+                        <a href="#" class="inline-link" onclick="return false;">Forgot password?</a>
+                    </div>
+
+                    <button type="submit" class="submit-btn" style="width: 100%;" id="loginBtn">
+                        <i class="fas fa-right-to-bracket"></i>
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <p>Need account support? <a href="#" class="inline-link" onclick="return false;">Contact Admin</a></p>
+                    <p style="margin-top: 10px;">
+                        <a href="index.html" class="inline-link">← Back to Home</a>
+                    </p>
+                </div>
+            </section>
         </div>
     </div>
 
-    <script src="../js/api.js"></script>
+    <script src="js/api.js"></script>
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const loginBtn = document.getElementById('loginBtn');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const alertBox = document.getElementById('alertBox');
+
+        function loadTheme() {
+            const theme = localStorage.getItem('cgs_theme') || 'dark';
+            document.body.setAttribute('data-theme', theme);
+        }
+
+        function showAlert(message, type = 'error') {
+            alertBox.className = `alert-box ${type}`;
+            alertBox.textContent = message;
+            alertBox.style.display = 'block';
+        }
+
+        function hideAlert() {
+            alertBox.style.display = 'none';
+            alertBox.textContent = '';
+        }
+
+        function saveSession(userData, remember) {
+            sessionStorage.setItem('cgs_logged_in', 'true');
+            sessionStorage.setItem('cgs_user', JSON.stringify(userData));
+
+            if (remember) {
+                localStorage.setItem('user', JSON.stringify(userData));
+            } else {
+                localStorage.removeItem('user');
+            }
+        }
+
+        function routeUser(userData) {
+            if (userData.role === 'admin' || userData.role === 'faculty') {
+                window.location.href = `${window.location.origin}/frontend/admin/dashboard.php`;
+                return;
+            }
+
+            window.location.href = '/frontend/dashboard.html';
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideAlert();
+
+            const login = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('rememberMe').checked;
+
+            if (!login || !password) {
+                showAlert('Please enter both username/email and password.');
+                return;
+            }
+
+            const originalHtml = loginBtn.innerHTML;
             loginBtn.disabled = true;
-            loginBtn.innerHTML = '<span class="spinner" style="width: 20px; height: 20px; margin: 0;"></span> Logging in...';
+            loginBtn.innerHTML = '<span class="loading-spinner"></span> Signing in...';
 
             try {
-                const credentials = {
-                    email: document.getElementById('email').value,
-                    password: document.getElementById('password').value
+                if (!window.API || typeof window.API.login !== 'function') {
+                    throw new Error('API helper is not available.');
+                }
+
+                const response = await window.API.login({ login, password });
+
+                if (!response?.success || !response?.data?.user) {
+                    throw new Error(response?.message || 'Login failed');
+                }
+
+                const backendUser = response.data.user;
+                const userData = {
+                    id: backendUser.id ?? null,
+                    name: backendUser.full_name || backendUser.username || login,
+                    email: backendUser.email || '',
+                    role: backendUser.role || 'student',
+                    department_id: backendUser.department_id ?? null
                 };
 
-                const response = await API.login(credentials);
-                
-                // Redirect based on role
-                if (response.user.role === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-            } catch (error) {
-                showAlert('Invalid email or password', 'danger');
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = 'Login';
-            }
-        });
+                saveSession(userData, remember);
 
-        function showAlert(message, type) {
-            const alertContainer = document.getElementById('alertContainer');
-            alertContainer.innerHTML = `
-                <div class="alert alert-${type}">
-                    ${message}
-                </div>
-            `;
+                showAlert('Login successful. Redirecting...', 'success');
+
+                setTimeout(() => {
+                    routeUser(userData);
+                }, 500);
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert(error.message || 'Invalid email or password.');
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = originalHtml;
+            }
         }
+
+        loginForm.addEventListener('submit', handleLogin);
+        document.addEventListener('DOMContentLoaded', loadTheme);
     </script>
 </body>
 </html>

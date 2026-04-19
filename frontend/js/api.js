@@ -1,6 +1,9 @@
+const API_BASE = `${window.location.origin}/api`;
+
 // API Configuration
 const API = {
-    baseURL: '/api',
+    baseURL: API_BASE,
+
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -9,26 +12,24 @@ const API = {
     // Generic request method
     async request(endpoint, options = {}) {
         try {
-            const token = localStorage.getItem('token');
-            if (token) {
-                options.headers = {
-                    ...options.headers,
-                    'Authorization': `Bearer ${token}`
-                };
-            }
-
             const response = await fetch(`${this.baseURL}${endpoint}`, {
                 ...options,
+                credentials: 'include',
                 headers: {
                     ...this.headers,
-                    ...options.headers
+                    ...(options.headers || {})
                 }
             });
 
-            const data = await response.json();
+            let data = null;
+            try {
+                data = await response.json();
+            } catch (parseError) {
+                data = null;
+            }
 
             if (!response.ok) {
-                throw new Error(data.message || 'Something went wrong');
+                throw new Error(data?.message || `Request failed with status ${response.status}`);
             }
 
             return data;
@@ -38,59 +39,169 @@ const API = {
         }
     },
 
-    // Issues
-    async getIssues(params = '') {
-        return this.request(`/issues${params}`);
-    },
-
-    async createIssue(issueData) {
-        return this.request('/issues', {
-            method: 'POST',
-            body: JSON.stringify(issueData)
-        });
-    },
-
-    async trackIssue(token) {
-        return this.request(`/issues/track/${token}`);
-    },
-
     // Auth
-    async login(credentials) {
+    async login({ login, password }) {
         const data = await this.request('/auth/login', {
             method: 'POST',
-            body: JSON.stringify(credentials)
+            body: JSON.stringify({ login, password })
         });
-        if (data.token) {
-            localStorage.setItem('token', data.token);
-            localStorage.setItem('user', JSON.stringify(data.user));
+
+        // Backend is session/cookie based, but store user locally for UI convenience
+        if (data?.success && data?.data?.user) {
+            localStorage.setItem('user', JSON.stringify(data.data.user));
         }
+
         return data;
     },
 
+    async register({
+        username,
+        email,
+        password,
+        full_name,
+        role,
+        department_id = null,
+        phone = ''
+    }) {
+        return this.request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                username,
+                email,
+                password,
+                full_name,
+                role,
+                department_id,
+                phone
+            })
+        });
+    },
+
+    async me() {
+        return this.request('/auth/me', {
+            method: 'GET'
+        });
+    },
+
     async logout() {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        window.location.href = '/login.html';
+        try {
+            await this.request('/auth/logout', {
+                method: 'POST'
+            });
+        } finally {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        }
     },
 
-    // Dashboard
-    async getDashboardStats() {
-        return this.request('/dashboard/stats');
+    // Public data
+    async getStats() {
+        return this.request('/stats', {
+            method: 'GET'
+        });
     },
 
-    async getChartData() {
-        return this.request('/dashboard/charts');
+    async getLatestReports() {
+        return this.request('/reports/latest', {
+            method: 'GET'
+        });
     },
 
-    // Admin
-    async getAllIssues() {
-        return this.request('/admin/issues');
+    async submitReport(reportData) {
+        return this.request('/report/submit', {
+            method: 'POST',
+            body: JSON.stringify(reportData)
+        });
     },
 
-    async updateIssueStatus(issueId, status) {
-        return this.request(`/admin/issues/${issueId}`, {
-            method: 'PUT',
+    async trackReport(token) {
+        return this.request(`/report/track?token=${encodeURIComponent(token)}`, {
+            method: 'GET'
+        });
+    },
+
+    async getReportDateCounts() {
+        return this.request('/report/date-counts', {
+            method: 'GET'
+        });
+    },
+
+    // Admin / faculty
+    async getUsers() {
+        return this.request('/admin/users', {
+            method: 'GET'
+        });
+    },
+
+    async createUser(userData) {
+        return this.request('/admin/users', {
+            method: 'POST',
+            body: JSON.stringify(userData)
+        });
+    },
+
+    async updateUserStatus(userId, status) {
+        return this.request(`/admin/users/${encodeURIComponent(userId)}/status`, {
+            method: 'PATCH',
             body: JSON.stringify({ status })
+        });
+    },
+
+    async getAdminReports() {
+        return this.request('/admin/reports', {
+            method: 'GET'
+        });
+    },
+
+    async updateReportStatus(reportId, status) {
+        return this.request(`/admin/reports/${encodeURIComponent(reportId)}/status`, {
+            method: 'PATCH',
+            body: JSON.stringify({ status })
+        });
+    },
+
+    async updateReportDetails(reportId, details) {
+        return this.request(`/admin/reports/${encodeURIComponent(reportId)}/details`, {
+            method: 'PATCH',
+            body: JSON.stringify(details)
+        });
+    },
+
+    async deleteReport(reportId) {
+        return this.request(`/admin/reports/${encodeURIComponent(reportId)}`, {
+            method: 'DELETE'
+        });
+    },
+
+    async getReportMedia(reportId) {
+        return this.request(`/admin/reports/${encodeURIComponent(reportId)}/media`, {
+            method: 'GET'
+        });
+    },
+
+    async getComments(reportId) {
+        return this.request(`/admin/reports/${encodeURIComponent(reportId)}/comments`, {
+            method: 'GET'
+        });
+    },
+
+    async addComment(reportId, content) {
+        return this.request(`/admin/reports/${encodeURIComponent(reportId)}/comments`, {
+            method: 'POST',
+            body: JSON.stringify({ content })
+        });
+    },
+
+    async getSpamReports() {
+        return this.request('/admin/spam-reports', {
+            method: 'GET'
+        });
+    },
+
+    async updateSpamState(reportId, is_spam) {
+        return this.request(`/admin/reports/${encodeURIComponent(reportId)}/spam`, {
+            method: 'PATCH',
+            body: JSON.stringify({ is_spam })
         });
     }
 };

@@ -1,714 +1,965 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Campus Governance System (CGS) - DIU</title>
-    
-    <!-- CSS files -->
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/theme.css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body data-theme="dark">
-    <div class="progress-container">
+    <div class="progress-container" aria-hidden="true">
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
-<header class="site-header">
-    <div class="container">
-        <div class="header-content">
-            <!-- Logo and Institution -->
-            <div class="logo-area">
-                <a href="index.html" class="logo-link">
-                    <div class="logo-icon">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <div class="logo-text">
-                        <h1>CAMPUS <span>GOVERNANCE</span></h1>
-                        <span class="institution">Daffodil International University · CGS</span>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Right side: All controls in one line -->
-            <div class="header-controls">
-                <!-- Theme Toggle -->
-                <div class="theme-toggle">
-                    <button class="theme-btn" id="themeToggle" onclick="toggleTheme()">
-                        <i class="fas fa-moon" id="themeIcon"></i>
-                    </button>
+    <header class="site-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo-area">
+                    <a href="index.html" class="logo-link" aria-label="Campus Governance System home">
+                        <div class="logo-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1>CAMPUS <span>GOVERNANCE</span></h1>
+                            <span class="institution">Daffodil International University · CGS</span>
+                        </div>
+                    </a>
                 </div>
 
-                <!-- Language Toggle -->
-                <div class="lang-toggle">
-                    <button class="lang-btn active" data-lang="en" onclick="setLanguage('en')">EN</button>
-                    <button class="lang-btn" data-lang="bn" onclick="setLanguage('bn')">বাংলা</button>
-                </div>
-
-                <!-- Authentication Buttons -->
-                <div class="auth-buttons">
-                    <div id="loggedOutView">
-                        <button class="btn-outline" onclick="openModal('loginModal')">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
-                        </button>
-                        <button class="btn-primary" onclick="openModal('registerModal')">
-                            <i class="fas fa-user-plus"></i> Sign Up
+                <div class="header-controls">
+                    <div class="theme-toggle">
+                        <button class="theme-btn" id="themeToggle" type="button" onclick="toggleTheme()" aria-label="Toggle theme">
+                            <i class="fas fa-moon" id="themeIcon"></i>
                         </button>
                     </div>
-                    <div id="loggedInView" style="display: none;">
-                        <div class="user-menu-container">
-                            <button class="btn-outline" onclick="toggleUserMenu()">
-                                <i class="fas fa-user-circle"></i>
-                                <span id="userNameDisplay">User</span>
-                                <i class="fas fa-chevron-down"></i>
+
+                    <div class="lang-toggle" aria-label="Language switcher">
+                        <button class="lang-btn active" type="button" data-lang="en" onclick="setLanguage('en')">EN</button>
+                        <button class="lang-btn" type="button" data-lang="bn" onclick="setLanguage('bn')">বাংলা</button>
+                    </div>
+
+                    <div class="auth-buttons" id="loggedOutView">
+                        <button class="btn-outline" type="button" onclick="openModal('loginModal')">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span class="auth-en">Sign In</span>
+                            <span class="auth-bn" style="display: none;">সাইন ইন</span>
+                        </button>
+                        <button class="btn-primary" type="button" onclick="openModal('registerModal')">
+                            <i class="fas fa-user-plus"></i>
+                            <span class="auth-en">Sign Up</span>
+                            <span class="auth-bn" style="display: none;">সাইন আপ</span>
+                        </button>
+                    </div>
+
+                    <div class="user-menu-container" id="loggedInView" style="display: none;">
+                        <button class="btn-outline user-menu-btn" type="button" onclick="toggleUserMenu()">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="userNameDisplay">User</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+
+                        <div class="user-menu" id="userMenu" style="display: none;">
+                            <a href="dashboard.html" data-menu="dashboard">
+                                <i class="fas fa-chart-line"></i>
+                                <span class="menu-en">Dashboard</span>
+                                <span class="menu-bn" style="display: none;">ড্যাশবোর্ড</span>
+                            </a>
+<a href="admin/dashboard.php" data-menu="admin-panel">
+                                <i class="fas fa-shield-halved"></i>
+                                <span class="menu-en">Admin Panel</span>
+                                <span class="menu-bn" style="display: none;">অ্যাডমিন প্যানেল</span>
+                            </a>
+                            <button type="button" onclick="logout()">
+                                <i class="fas fa-right-from-bracket"></i>
+                                <span class="menu-en">Logout</span>
+                                <span class="menu-bn" style="display: none;">লগআউট</span>
                             </button>
-                            <div id="userMenu" class="user-dropdown">
-                                <a href="dashboard.html"><i class="fas fa-chart-bar"></i> Dashboard</a>
-                                <a href="department.html"><i class="fas fa-building"></i> Department Portal</a>
-                                <a href="admin/dashboard.php"><i class="fas fa-cog"></i> Admin Panel</a>
-                                <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sign Out</button>
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 
-    <!-- ===== EMERGENCY BANNER ===== -->
-    <div class="emergency-banner">
+    <div class="emergency-banner" id="emergencyBanner">
         <div class="container">
             <div class="emergency-content">
                 <span class="emergency-icon">🚨</span>
-                <span class="emergency-text">For immediate threats, contact Campus Security:</span>
+                <span class="emergency-text emergency-text-en">For immediate threats, contact Campus Security:</span>
+                <span class="emergency-text emergency-text-bn" style="display: none;">তাৎক্ষণিক ঝুঁকির ক্ষেত্রে ক্যাম্পাস নিরাপত্তার সাথে যোগাযোগ করুন:</span>
                 <a href="tel:+8801712345678" class="emergency-phone">📞 01712-345678</a>
                 <span class="emergency-divider">|</span>
                 <a href="tel:+8801812345678" class="emergency-phone">📞 01812-345678</a>
-                <button class="close-banner" onclick="this.parentElement.parentElement.style.display='none'">✕</button>
+                <button class="close-banner" type="button" onclick="closeEmergencyBanner()" aria-label="Close emergency banner">✕</button>
             </div>
         </div>
     </div>
 
-    <!-- ===== HERO SECTION with Liquid Glass Design (SINGLE) ===== -->
     <section class="hero-stats-section">
         <div class="container">
-            <!-- Hero Content with Glass Effect -->
             <div class="hero-glass-wrapper">
-                <div class="cta-block glass-hero">
-                    <h1 class="cta-title">
-                        <span class="cta-text-en">Speak up.</span> <span class="cta-text-en">Stay anonymous.</span>
-                        <span class="cta-text-bn" style="display: none;">সোচ্চার হোন। <span>বেনামে থাকুন।</span></span>
-                    </h1>
-                    <p class="cta-subtitle">
-                        <span class="cta-sub-en">Report campus issues anonymously or with your identity. Track until resolution.</span>
-                        <span class="cta-sub-bn" style="display: none;">বেনামে বা পরিচয় সহ ক্যাম্পাসের সমস্যা রিপোর্ট করুন। সমাধান পর্যন্ত ট্র্যাক করুন।</span>
-                    </p>
-                    
-                    <div class="cta-actions">
-                        <button class="glass-btn glass-btn-primary" onclick="openModal('reportModal')">
-                            <span class="btn-icon">📢</span> 
-                            <span class="btn-text-en">Submit Anonymous Report</span>
-                            <span class="btn-text-bn" style="display: none;">বেনামে রিপোর্ট জমা দিন</span>
-                        </button>
-                        <button class="glass-btn glass-btn-secondary" onclick="window.location.href='track.html'">
-                            <span class="btn-icon">🔍</span> 
-                            <span class="btn-text-en">Track Your Token</span>
-                            <span class="btn-text-bn" style="display: none;">টোকেন ট্র্যাক করুন</span>
-                        </button>
+                <div class="hero-content-grid">
+                    <div class="cta-block glass-hero">
+                        <div class="hero-badge">
+                            <i class="fas fa-shield-heart"></i>
+                            <span class="hero-badge-en">Safe, anonymous and trackable reporting</span>
+                            <span class="hero-badge-bn" style="display: none;">নিরাপদ, বেনামী এবং ট্র্যাকযোগ্য রিপোর্টিং</span>
+                        </div>
+
+                        <h1 class="cta-title">
+                            <span class="cta-text-en">Speak up. Stay protected.</span>
+                            <span class="cta-text-bn" style="display: none;">আপনার কথা বলুন। নিরাপদ থাকুন।</span>
+                        </h1>
+
+                        <p class="cta-subtitle">
+                            <span class="cta-sub-en">
+                                Report campus issues with confidence, monitor progress with a token, and help create a more accountable university environment.
+                            </span>
+                            <span class="cta-sub-bn" style="display: none;">
+                                আত্মবিশ্বাসের সাথে ক্যাম্পাস সমস্যা রিপোর্ট করুন, টোকেন দিয়ে অগ্রগতি ট্র্যাক করুন এবং আরও জবাবদিহিমূলক বিশ্ববিদ্যালয় পরিবেশ গড়ে তুলতে সহায়তা করুন।
+                            </span>
+                        </p>
+
+                        <div class="cta-actions">
+                            <button class="glass-btn glass-btn-primary" type="button" onclick="openModal('reportModal')">
+                                <span class="btn-icon"><i class="fas fa-bullhorn"></i></span>
+                                <span class="btn-text-en">Submit Anonymous Report</span>
+                                <span class="btn-text-bn" style="display: none;">বেনামী রিপোর্ট জমা দিন</span>
+                            </button>
+
+                            <button class="glass-btn glass-btn-secondary" type="button" onclick="window.location.href='track.html'">
+                                <span class="btn-icon"><i class="fas fa-magnifying-glass"></i></span>
+                                <span class="btn-text-en">Track Your Token</span>
+                                <span class="btn-text-bn" style="display: none;">আপনার টোকেন ট্র্যাক করুন</span>
+                            </button>
+                        </div>
+
+                        <div class="hero-trust-points">
+                            <div class="trust-point">
+                                <i class="fas fa-user-secret"></i>
+                                <span class="trust-en">Anonymous options</span>
+                                <span class="trust-bn" style="display: none;">বেনামী বিকল্প</span>
+                            </div>
+                            <div class="trust-point">
+                                <i class="fas fa-clock-rotate-left"></i>
+                                <span class="trust-en">Live status updates</span>
+                                <span class="trust-bn" style="display: none;">লাইভ স্ট্যাটাস আপডেট</span>
+                            </div>
+                            <div class="trust-point">
+                                <i class="fas fa-file-shield"></i>
+                                <span class="trust-en">Secure records</span>
+                                <span class="trust-bn" style="display: none;">নিরাপদ রেকর্ড</span>
+                            </div>
+                        </div>
                     </div>
+
+                    <aside class="hero-side-panel glass-card">
+                        <div class="panel-header">
+                            <h3 class="panel-title-en">Need help fast?</h3>
+                            <h3 class="panel-title-bn" style="display: none;">দ্রুত সহায়তা দরকার?</h3>
+                            <p class="panel-subtitle-en">Use one of these direct actions</p>
+                            <p class="panel-subtitle-bn" style="display: none;">এই সরাসরি অপশনগুলোর একটি ব্যবহার করুন</p>
+                        </div>
+
+                        <div class="quick-action-stack">
+                            <a class="quick-action-card" href="report.html">
+                                <span class="quick-action-icon"><i class="fas fa-pen-to-square"></i></span>
+                                <span class="quick-action-copy">
+                                    <strong class="qa-en">Open full report form</strong>
+                                    <strong class="qa-bn" style="display: none;">পূর্ণ রিপোর্ট ফর্ম খুলুন</strong>
+                                    <small class="qa-sub-en">With more fields and evidence upload</small>
+                                    <small class="qa-sub-bn" style="display: none;">আরও ফিল্ড এবং এভিডেন্স আপলোডসহ</small>
+                                </span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+
+                            <a class="quick-action-card" href="track.html">
+                                <span class="quick-action-icon"><i class="fas fa-location-crosshairs"></i></span>
+                                <span class="quick-action-copy">
+                                    <strong class="qa-en">Track existing report</strong>
+                                    <strong class="qa-bn" style="display: none;">বিদ্যমান রিপোর্ট ট্র্যাক করুন</strong>
+                                    <small class="qa-sub-en">Use your saved token instantly</small>
+                                    <small class="qa-sub-bn" style="display: none;">সংরক্ষিত টোকেন দিয়ে তাৎক্ষণিক ট্র্যাকিং</small>
+                                </span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+
+                            <a class="quick-action-card" href="public-analytics.html">
+                                <span class="quick-action-icon"><i class="fas fa-chart-pie"></i></span>
+                                <span class="quick-action-copy">
+                                    <strong class="qa-en">View public analytics</strong>
+                                    <strong class="qa-bn" style="display: none;">পাবলিক অ্যানালিটিক্স দেখুন</strong>
+                                    <small class="qa-sub-en">Check status trends and response data</small>
+                                    <small class="qa-sub-bn" style="display: none;">স্ট্যাটাস ট্রেন্ড এবং রেসপন্স ডেটা দেখুন</small>
+                                </span>
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </aside>
                 </div>
             </div>
 
-            <!-- Live Stats Counter (SINGLE) -->
             <div class="stats-grid" id="statsGrid">
-                <div class="stat-card glass-card">
-                    <span class="stat-value" id="totalReports">0</span>
-                    <span class="stat-label stat-label-en">Total Reports</span>
-                    <span class="stat-label stat-label-bn" style="display: none;">মোট রিপোর্ট</span>
-                    <div class="stat-glow"></div>
-                </div>
-                <div class="stat-card glass-card">
-                    <span class="stat-value" id="verifiedReports">0</span>
-                    <span class="stat-label stat-label-en">Verified Incidents</span>
-                    <span class="stat-label stat-label-bn" style="display: none;">যাচাইকৃত ঘটনা</span>
-                    <div class="stat-glow"></div>
-                </div>
-                <div class="stat-card glass-card">
-                    <span class="stat-value" id="pendingReports">0</span>
-                    <span class="stat-label stat-label-en">Under Review</span>
-                    <span class="stat-label stat-label-bn" style="display: none;">পর্যালোচনাধীন</span>
-                    <div class="stat-glow"></div>
-                </div>
-                <div class="stat-card glass-card">
-                    <span class="stat-value" id="resolvedReports">0</span>
-                    <span class="stat-label stat-label-en">Resolved</span>
-                    <span class="stat-label stat-label-bn" style="display: none;">সমাধানকৃত</span>
-                    <div class="stat-glow"></div>
-                </div>
+                <div class="stat-card glass-card"><div class="stat-card-top"><span class="stat-chip"><i class="fas fa-flag"></i></span></div><span class="stat-value" id="totalReports">0</span><span class="stat-label stat-label-en">Total Reports</span><span class="stat-label stat-label-bn" style="display: none;">মোট রিপোর্ট</span><div class="stat-glow"></div></div>
+                <div class="stat-card glass-card"><div class="stat-card-top"><span class="stat-chip"><i class="fas fa-circle-check"></i></span></div><span class="stat-value" id="verifiedReports">0</span><span class="stat-label stat-label-en">Verified Incidents</span><span class="stat-label stat-label-bn" style="display: none;">যাচাইকৃত ঘটনা</span><div class="stat-glow"></div></div>
+                <div class="stat-card glass-card"><div class="stat-card-top"><span class="stat-chip"><i class="fas fa-hourglass-half"></i></span></div><span class="stat-value" id="pendingReports">0</span><span class="stat-label stat-label-en">Under Review</span><span class="stat-label stat-label-bn" style="display: none;">পর্যালোচনাধীন</span><div class="stat-glow"></div></div>
+                <div class="stat-card glass-card"><div class="stat-card-top"><span class="stat-chip"><i class="fas fa-check-double"></i></span></div><span class="stat-value" id="resolvedReports">0</span><span class="stat-label stat-label-en">Resolved</span><span class="stat-label stat-label-bn" style="display: none;">সমাধানকৃত</span><div class="stat-glow"></div></div>
             </div>
         </div>
     </section>
 
-    <!-- ===== QUICK ISSUE CATEGORIES ===== -->
     <section class="categories-bar">
         <div class="container">
-            <div class="category-chips">
-                <button class="chip active" data-cat="all">
-                    <span class="chip-en">🔍 All Issues</span>
-                    <span class="chip-bn" style="display: none;">🔍 সব সমস্যা</span>
-                </button>
-                <button class="chip" data-cat="academic">
-                    <span class="chip-en">📚 Academic</span>
-                    <span class="chip-bn" style="display: none;">📚 একাডেমিক</span>
-                </button>
-                <button class="chip" data-cat="facility">
-                    <span class="chip-en">🏫 Facility</span>
-                    <span class="chip-bn" style="display: none;">🏫 সুবিধা</span>
-                </button>
-                <button class="chip" data-cat="transport">
-                    <span class="chip-en">🚌 Transport</span>
-                    <span class="chip-bn" style="display: none;">🚌 পরিবহন</span>
-                </button>
-                <button class="chip" data-cat="security">
-                    <span class="chip-en">🛡️ Security</span>
-                    <span class="chip-bn" style="display: none;">🛡️ নিরাপত্তা</span>
-                </button>
-                <button class="chip" data-cat="harassment">
-                    <span class="chip-en">⚖️ Harassment</span>
-                    <span class="chip-bn" style="display: none;">⚖️ হয়রানি</span>
-                </button>
-                <button class="chip" data-cat="it">
-                    <span class="chip-en">💻 IT Services</span>
-                    <span class="chip-bn" style="display: none;">💻 আইটি সেবা</span>
-                </button>
-                <button class="chip" data-cat="admin">
-                    <span class="chip-en">🧾 Administrative</span>
-                    <span class="chip-bn" style="display: none;">🧾 প্রশাসনিক</span>
-                </button>
+            <div class="section-heading compact-heading">
+                <div>
+                    <h2 class="section-title-en">Browse issue categories</h2>
+                    <h2 class="section-title-bn" style="display: none;">সমস্যার বিভাগ দেখুন</h2>
+                    <p class="section-subtitle-en">Filter the latest public feed by category or keyword</p>
+                    <p class="section-subtitle-bn" style="display: none;">বিভাগ বা কীওয়ার্ড দিয়ে সর্বশেষ পাবলিক ফিড ফিল্টার করুন</p>
+                </div>
             </div>
-            
-            <!-- Search Bar -->
+
+            <div class="category-chips" id="categoryChips">
+                <button class="chip active" type="button" data-cat="all"><span class="chip-en">All Issues</span><span class="chip-bn" style="display: none;">সব সমস্যা</span></button>
+                <button class="chip" type="button" data-cat="academic"><span class="chip-en">Academic</span><span class="chip-bn" style="display: none;">একাডেমিক</span></button>
+                <button class="chip" type="button" data-cat="facility"><span class="chip-en">Facility</span><span class="chip-bn" style="display: none;">সুবিধা</span></button>
+                <button class="chip" type="button" data-cat="transport"><span class="chip-en">Transport</span><span class="chip-bn" style="display: none;">পরিবহন</span></button>
+                <button class="chip" type="button" data-cat="security"><span class="chip-en">Security</span><span class="chip-bn" style="display: none;">নিরাপত্তা</span></button>
+                <button class="chip" type="button" data-cat="harassment"><span class="chip-en">Harassment</span><span class="chip-bn" style="display: none;">হয়রানি</span></button>
+                <button class="chip" type="button" data-cat="it"><span class="chip-en">IT Services</span><span class="chip-bn" style="display: none;">আইটি সেবা</span></button>
+                <button class="chip" type="button" data-cat="admin"><span class="chip-en">Administrative</span><span class="chip-bn" style="display: none;">প্রশাসনিক</span></button>
+            </div>
+
             <div class="search-container">
-                <input type="text" id="searchReports" 
-                       placeholder-en="🔍 Search reports by keyword, location, or token..." 
-                       placeholder-bn="🔍 কীওয়ার্ড, অবস্থান বা টোকেন দ্বারা অনুসন্ধান..."
-                       placeholder="🔍 Search reports by keyword, location, or token...">
-                <button class="search-btn">
-                    <span class="search-btn-en">Search</span>
-                    <span class="search-btn-bn" style="display: none;">অনুসন্ধান</span>
-                </button>
+                <div class="search-shell">
+                    <i class="fas fa-search search-shell-icon"></i>
+                    <input type="text" id="searchReports" placeholder="Search reports by title, location, token, or status..." aria-label="Search reports" />
+                </div>
+                <button class="search-btn" type="button"><span class="search-btn-en">Search</span><span class="search-btn-bn" style="display: none;">অনুসন্ধান</span></button>
+                <button class="btn-outline clear-search-btn" id="clearSearchBtn" type="button"><span class="clear-en">Clear</span><span class="clear-bn" style="display: none;">মুছুন</span></button>
             </div>
         </div>
     </section>
 
-    <!-- ===== PUBLIC REPORTS FEED ===== -->
     <section class="public-feed">
         <div class="container">
             <div class="feed-header">
-                <h3 class="feed-title">
-                    <span class="feed-title-en">📌 Latest Reports</span>
-                    <span class="feed-title-bn" style="display: none;">📌 সর্বশেষ রিপোর্ট</span>
-                </h3>
-            </div>
-            
-            <div class="reports-list" id="reportsList">
-                <!-- Reports will be loaded dynamically -->
-                <div class="report-item">
-                    <div class="report-header">
-                        <span class="report-category">Loading...</span>
-                        <span class="report-status">Please wait</span>
-                    </div>
-                    <p class="report-excerpt">Fetching latest reports from database...</p>
+                <div>
+                    <h3 class="feed-title"><span class="feed-title-en">Latest Reports</span><span class="feed-title-bn" style="display: none;">সর্বশেষ রিপোর্ট</span></h3>
+                    <p class="feed-description"><span class="feed-desc-en">Homepage highlights verified and resolved cases first.</span><span class="feed-desc-bn" style="display: none;">হোমপেজে আগে যাচাইকৃত এবং সমাধানকৃত কেস দেখানো হয়।</span></p>
+                </div>
+                <div class="feed-tools">
+                    <button class="btn-outline" type="button" onclick="refreshHomeData()"><i class="fas fa-rotate-right"></i><span class="refresh-en">Refresh</span><span class="refresh-bn" style="display: none;">রিফ্রেশ</span></button>
                 </div>
             </div>
-            
-            <div class="feed-footer">
-                <button class="load-more-btn" onclick="window.location.href='dashboard.html'">
-                    <span class="loadmore-en">View All Reports →</span>
-                    <span class="loadmore-bn" style="display: none;">সকল রিপোর্ট দেখুন →</span>
+
+            <div class="reports-grid reports-grid-compact" id="reportsList">
+                <div class="report-empty-state glass-card">
+                    <div class="empty-icon"><i class="fas fa-spinner fa-spin"></i></div>
+                    <h4 class="empty-en">Loading reports...</h4>
+                    <h4 class="empty-bn" style="display: none;">রিপোর্ট লোড হচ্ছে...</h4>
+                    <p class="empty-sub-en">Please wait while the latest data is fetched.</p>
+                    <p class="empty-sub-bn" style="display: none;">সর্বশেষ ডেটা আনা হচ্ছে, অনুগ্রহ করে অপেক্ষা করুন।</p>
+                </div>
+            </div>
+
+            <div class="view-more-row" id="viewMoreRow" style="display: none;">
+                <button class="btn-outline view-more-btn" id="toggleReportsBtn" type="button" onclick="toggleReportsView()">
+                    <i class="fas fa-chevron-down" id="toggleReportsIcon"></i>
+                    <span id="toggleReportsTextEn">View More Reports</span>
+                    <span id="toggleReportsTextBn" style="display: none;">আরও রিপোর্ট দেখুন</span>
                 </button>
             </div>
         </div>
     </section>
 
-    <!-- ===== HOW IT WORKS ===== -->
-    <section class="how-it-works">
+    <section class="highlights-section">
         <div class="container">
-            <h3 class="section-title">
-                <span class="section-title-en">The Process</span>
-                <span class="section-title-bn" style="display: none;">পদ্ধতি</span>
-            </h3>
-            <div class="steps-grid">
-                <div class="step-item">
-                    <div class="step-icon">1️⃣</div>
-                    <h4>
-                        <span class="step-title-en">Submit Anonymously</span>
-                        <span class="step-title-bn" style="display: none;">বেনামে জমা দিন</span>
-                    </h4>
-                    <p>
-                        <span class="step-desc-en">No login required. Your identity is protected.</span>
-                        <span class="step-desc-bn" style="display: none;">লগইনের প্রয়োজন নেই। আপনার পরিচয় সুরক্ষিত।</span>
-                    </p>
-                </div>
-                <div class="step-item">
-                    <div class="step-icon">2️⃣</div>
-                    <h4>
-                        <span class="step-title-en">Receive Secure Token</span>
-                        <span class="step-title-bn" style="display: none;">নিরাপদ টোকেন গ্রহণ</span>
-                    </h4>
-                    <p>
-                        <span class="step-desc-en">Track, update, or withdraw your report anytime.</span>
-                        <span class="step-desc-bn" style="display: none;">যে কোনো সময় রিপোর্ট ট্র্যাক, আপডেট বা প্রত্যাহার করুন।</span>
-                    </p>
-                </div>
-                <div class="step-item">
-                    <div class="step-icon">3️⃣</div>
-                    <h4>
-                        <span class="step-title-en">Authority Review</span>
-                        <span class="step-title-bn" style="display: none;">কর্তৃপক্ষের পর্যালোচনা</span>
-                    </h4>
-                    <p>
-                        <span class="step-desc-en">Department investigates with SLA enforcement.</span>
-                        <span class="step-desc-bn" style="display: none;">বিভাগ এসএলএ সহ তদন্ত করে।</span>
-                    </p>
-                </div>
-                <div class="step-item">
-                    <div class="step-icon">4️⃣</div>
-                    <h4>
-                        <span class="step-title-en">Resolution & Feedback</span>
-                        <span class="step-title-bn" style="display: none;">সমাধান ও মতামত</span>
-                    </h4>
-                    <p>
-                        <span class="step-desc-en">Outcome published. Rate your experience.</span>
-                        <span class="step-desc-bn" style="display: none;">ফলাফল প্রকাশিত। আপনার অভিজ্ঞতা রেট দিন।</span>
-                    </p>
-                </div>
+            <div class="section-heading"><div><h2 class="section-title-en">Why this system works</h2><h2 class="section-title-bn" style="display: none;">এই সিস্টেম কেন কার্যকর</h2><p class="section-subtitle-en">Designed for transparency, safety, and action</p><p class="section-subtitle-bn" style="display: none;">স্বচ্ছতা, নিরাপত্তা এবং কার্যকর ব্যবস্থার জন্য ডিজাইন করা</p></div></div>
+            <div class="feature-grid">
+                <article class="feature-card glass-card"><div class="feature-icon"><i class="fas fa-user-secret"></i></div><h4 class="feature-title-en">Anonymous by default</h4><h4 class="feature-title-bn" style="display: none;">ডিফল্টভাবে বেনামী</h4><p class="feature-desc-en">Students, staff, and guardians can raise concerns without fear of exposure.</p><p class="feature-desc-bn" style="display: none;">শিক্ষার্থী, কর্মী এবং অভিভাবকেরা পরিচয় প্রকাশের ভয় ছাড়াই অভিযোগ জানাতে পারেন।</p></article>
+                <article class="feature-card glass-card"><div class="feature-icon"><i class="fas fa-route"></i></div><h4 class="feature-title-en">Trackable workflow</h4><h4 class="feature-title-bn" style="display: none;">ট্র্যাকযোগ্য ওয়ার্কফ্লো</h4><p class="feature-desc-en">Every report can be followed through review, assignment, and resolution stages.</p><p class="feature-desc-bn" style="display: none;">প্রতিটি রিপোর্ট রিভিউ, অ্যাসাইনমেন্ট এবং সমাধান ধাপ পর্যন্ত অনুসরণ করা যায়।</p></article>
+                <article class="feature-card glass-card"><div class="feature-icon"><i class="fas fa-users-gear"></i></div><h4 class="feature-title-en">Department accountability</h4><h4 class="feature-title-bn" style="display: none;">ডিপার্টমেন্ট জবাবদিহি</h4><p class="feature-desc-en">Departments can review incoming cases and respond faster with visible progress updates.</p><p class="feature-desc-bn" style="display: none;">ডিপার্টমেন্টগুলো ইনকামিং কেস রিভিউ করে দৃশ্যমান অগ্রগতি আপডেটসহ দ্রুত সাড়া দিতে পারে।</p></article>
+                <article class="feature-card glass-card"><div class="feature-icon"><i class="fas fa-chart-column"></i></div><h4 class="feature-title-en">Measurable outcomes</h4><h4 class="feature-title-bn" style="display: none;">পরিমাপযোগ্য ফলাফল</h4><p class="feature-desc-en">Public metrics help identify response quality, trends, and unresolved issue areas.</p><p class="feature-desc-bn" style="display: none;">পাবলিক মেট্রিক্স রেসপন্সের মান, ট্রেন্ড এবং অমীমাংসিত সমস্যার ক্ষেত্র চিহ্নিত করতে সাহায্য করে।</p></article>
             </div>
         </div>
     </section>
 
-    <!-- ===== EMERGENCY CONTACTS GRID ===== -->
+    <section class="steps-section">
+        <div class="container">
+            <div class="section-heading"><div><h2 class="section-title-en">How reporting works</h2><h2 class="section-title-bn" style="display: none;">রিপোর্টিং কীভাবে কাজ করে</h2><p class="section-subtitle-en">A simple four-step journey from submission to resolution</p><p class="section-subtitle-bn" style="display: none;">জমা দেওয়া থেকে সমাধান পর্যন্ত সহজ চার ধাপের যাত্রা</p></div></div>
+            <div class="steps-grid">
+                <div class="step-item glass-card"><div class="step-icon">1</div><h4 class="step-title-en">Submit report</h4><h4 class="step-title-bn" style="display: none;">রিপোর্ট জমা দিন</h4><p class="step-desc-en">Enter category, title, description, and location.</p><p class="step-desc-bn" style="display: none;">বিভাগ, শিরোনাম, বিবরণ এবং অবস্থান দিন।</p></div>
+                <div class="step-item glass-card"><div class="step-icon">2</div><h4 class="step-title-en">Receive token</h4><h4 class="step-title-bn" style="display: none;">টোকেন গ্রহণ করুন</h4><p class="step-desc-en">A unique tracking token is generated immediately.</p><p class="step-desc-bn" style="display: none;">তাৎক্ষণিকভাবে একটি ইউনিক ট্র্যাকিং টোকেন তৈরি হয়।</p></div>
+                <div class="step-item glass-card"><div class="step-icon">3</div><h4 class="step-title-en">Review and routing</h4><h4 class="step-title-bn" style="display: none;">রিভিউ এবং রাউটিং</h4><p class="step-desc-en">The issue is reviewed and sent to the relevant authority.</p><p class="step-desc-bn" style="display: none;">সমস্যাটি রিভিউ করে সংশ্লিষ্ট কর্তৃপক্ষের কাছে পাঠানো হয়।</p></div>
+                <div class="step-item glass-card"><div class="step-icon">4</div><h4 class="step-title-en">Resolution and follow-up</h4><h4 class="step-title-bn" style="display: none;">সমাধান এবং ফলো-আপ</h4><p class="step-desc-en">Status is updated until closure and public accountability is maintained.</p><p class="step-desc-bn" style="display: none;">সমাধান না হওয়া পর্যন্ত স্ট্যাটাস আপডেট হয় এবং পাবলিক জবাবদিহি বজায় থাকে।</p></div>
+            </div>
+        </div>
+    </section>
+
     <section class="emergency-contacts-section">
         <div class="container">
-            <h3 class="section-title">
-                <span class="section-title-en">🚨 Emergency Contacts</span>
-                <span class="section-title-bn" style="display: none;">🚨 জরুরি যোগাযোগ</span>
-            </h3>
+            <div class="section-heading"><div><h2 class="section-title-en">Emergency contacts</h2><h2 class="section-title-bn" style="display: none;">জরুরি যোগাযোগ</h2><p class="section-subtitle-en">For urgent incidents, contact support directly before filing a report</p><p class="section-subtitle-bn" style="display: none;">জরুরি ঘটনার ক্ষেত্রে রিপোর্ট করার আগে সরাসরি সহায়তার সাথে যোগাযোগ করুন</p></div></div>
             <div class="contacts-grid">
-                <div class="contact-card" onclick="window.location.href='tel:+8801712345678'">
-                    <div class="contact-icon">👮</div>
-                    <div class="contact-info">
-                        <h4>
-                            <span class="contact-title-en">Campus Security</span>
-                            <span class="contact-title-bn" style="display: none;">ক্যাম্পাস নিরাপত্তা</span>
-                        </h4>
-                        <p>
-                            <span class="contact-desc-en">24/7 Emergency Response</span>
-                            <span class="contact-desc-bn" style="display: none;">২৪/৭ জরুরি সেবা</span>
-                        </p>
-                        <span class="contact-number">01712-345678</span>
-                    </div>
-                </div>
-                <div class="contact-card" onclick="window.location.href='tel:+8801812345678'">
-                    <div class="contact-icon">🏥</div>
-                    <div class="contact-info">
-                        <h4>
-                            <span class="contact-title-en">Medical Center</span>
-                            <span class="contact-title-bn" style="display: none;">মেডিকেল সেন্টার</span>
-                        </h4>
-                        <p>
-                            <span class="contact-desc-en">First Aid & Emergency</span>
-                            <span class="contact-desc-bn" style="display: none;">প্রাথমিক চিকিৎসা ও জরুরি সেবা</span>
-                        </p>
-                        <span class="contact-number">01812-345678</span>
-                    </div>
-                </div>
-                <div class="contact-card" onclick="window.location.href='tel:+8801912345678'">
-                    <div class="contact-icon">👩‍⚖️</div>
-                    <div class="contact-info">
-                        <h4>
-                            <span class="contact-title-en">Women's Support</span>
-                            <span class="contact-title-bn" style="display: none;">নারী সহায়তা</span>
-                        </h4>
-                        <p>
-                            <span class="contact-desc-en">Harassment & Safety</span>
-                            <span class="contact-desc-bn" style="display: none;">হয়রানি ও নিরাপত্তা</span>
-                        </p>
-                        <span class="contact-number">01912-345678</span>
-                    </div>
-                </div>
-                <div class="contact-card" onclick="window.location.href='tel:+8801612345678'">
-                    <div class="contact-icon">🔥</div>
-                    <div class="contact-info">
-                        <h4>
-                            <span class="contact-title-en">Fire & Safety</span>
-                            <span class="contact-title-bn" style="display: none;">অগ্নি নিরাপত্তা</span>
-                        </h4>
-                        <p>
-                            <span class="contact-desc-en">Fire Emergency</span>
-                            <span class="contact-desc-bn" style="display: none;">অগ্নিকাণ্ড জরুরি</span>
-                        </p>
-                        <span class="contact-number">01612-345678</span>
-                    </div>
-                </div>
+                <a class="contact-card" href="tel:+8801712345678"><div class="contact-card-top"><div class="contact-icon-wrap"><div class="contact-icon">👮</div></div><div class="contact-status-badge">24/7</div></div><div class="contact-card-body"><div class="contact-headline"><h4 class="contact-title-en">Campus Security</h4><h4 class="contact-title-bn" style="display: none;">ক্যাম্পাস নিরাপত্তা</h4><p class="contact-desc-en">Immediate response for threats, violence, and emergency campus incidents.</p><p class="contact-desc-bn" style="display: none;">হুমকি, সহিংসতা এবং জরুরি ক্যাম্পাস ঘটনার তাৎক্ষণিক সাড়া।</p></div><div class="contact-meta-list"><span><i class="fas fa-location-dot"></i> Main security desk</span><span><i class="fas fa-bolt"></i> Rapid response</span></div><div class="contact-card-footer"><span class="contact-number">01712-345678</span><span class="call-btn"><span class="call-btn-en">Call now</span><span class="call-btn-bn" style="display: none;">এখন কল করুন</span></span></div></div></a>
+                <a class="contact-card" href="tel:+8801812345678"><div class="contact-card-top"><div class="contact-icon-wrap"><div class="contact-icon">🏥</div></div><div class="contact-status-badge">Open</div></div><div class="contact-card-body"><div class="contact-headline"><h4 class="contact-title-en">Medical Center</h4><h4 class="contact-title-bn" style="display: none;">মেডিকেল সেন্টার</h4><p class="contact-desc-en">First aid, urgent health support, and emergency medical guidance.</p><p class="contact-desc-bn" style="display: none;">প্রাথমিক চিকিৎসা, জরুরি স্বাস্থ্য সহায়তা এবং মেডিকেল নির্দেশনা।</p></div><div class="contact-meta-list"><span><i class="fas fa-kit-medical"></i> First aid support</span><span><i class="fas fa-heart-pulse"></i> Emergency care</span></div><div class="contact-card-footer"><span class="contact-number">01812-345678</span><span class="call-btn"><span class="call-btn-en">Call now</span><span class="call-btn-bn" style="display: none;">এখন কল করুন</span></span></div></div></a>
+                <a class="contact-card" href="tel:+8801912345678"><div class="contact-card-top"><div class="contact-icon-wrap"><div class="contact-icon">👩‍⚖️</div></div><div class="contact-status-badge">Priority</div></div><div class="contact-card-body"><div class="contact-headline"><h4 class="contact-title-en">Women's Support</h4><h4 class="contact-title-bn" style="display: none;">নারী সহায়তা</h4><p class="contact-desc-en">Support for harassment, abuse, and safety-related concerns.</p><p class="contact-desc-bn" style="display: none;">হয়রানি, নির্যাতন এবং নিরাপত্তা-সংশ্লিষ্ট বিষয়ে সহায়তা।</p></div><div class="contact-meta-list"><span><i class="fas fa-shield-heart"></i> Safe support</span><span><i class="fas fa-user-group"></i> Dedicated team</span></div><div class="contact-card-footer"><span class="contact-number">01912-345678</span><span class="call-btn"><span class="call-btn-en">Call now</span><span class="call-btn-bn" style="display: none;">এখন কল করুন</span></span></div></div></a>
+                <a class="contact-card" href="tel:+8801612345678"><div class="contact-card-top"><div class="contact-icon-wrap"><div class="contact-icon">🔥</div></div><div class="contact-status-badge">Urgent</div></div><div class="contact-card-body"><div class="contact-headline"><h4 class="contact-title-en">Fire and Safety</h4><h4 class="contact-title-bn" style="display: none;">অগ্নি ও নিরাপত্তা</h4><p class="contact-desc-en">Fire incidents, evacuation issues, and building safety response.</p><p class="contact-desc-bn" style="display: none;">অগ্নিকাণ্ড, সরিয়ে নেওয়া এবং ভবন নিরাপত্তা সহায়তা।</p></div><div class="contact-meta-list"><span><i class="fas fa-fire-extinguisher"></i> Fire response</span><span><i class="fas fa-triangle-exclamation"></i> Safety alert</span></div><div class="contact-card-footer"><span class="contact-number">01612-345678</span><span class="call-btn"><span class="call-btn-en">Call now</span><span class="call-btn-bn" style="display: none;">এখন কল করুন</span></span></div></div></a>
             </div>
         </div>
     </section>
 
-    <!-- ===== TESTIMONIALS ===== -->
     <section class="testimonials">
         <div class="container">
-            <div class="testimonial-slider" id="testimonialSlider">
-                <div class="testimonial-item active">
-                    <p>"Reported a security issue anonymously. It was resolved in 2 days!"</p>
-                    <cite>- Anonymous Student</cite>
-                </div>
-                <div class="testimonial-item">
-                    <p>"The token system is brilliant. I could track everything without revealing my identity."</p>
-                    <cite>- Faculty Member</cite>
-                </div>
-                <div class="testimonial-item">
-                    <p>"Finally a platform where our voices are heard without fear."</p>
-                    <cite>- Guardian</cite>
-                </div>
+            <div class="section-heading"><div><h2 class="section-title-en">Community feedback</h2><h2 class="section-title-bn" style="display: none;">কমিউনিটি মতামত</h2><p class="section-subtitle-en">Examples of how a clearer reporting flow improves trust</p><p class="section-subtitle-bn" style="display: none;">কীভাবে পরিষ্কার রিপোর্টিং ফ্লো আস্থা বাড়ায় তার উদাহরণ</p></div></div>
+            <div class="testimonial-slider glass-card" id="testimonialSlider">
+                <article class="testimonial-item active"><p class="testimonial-copy-en">“I reported a security concern anonymously and could see progress clearly until it was resolved.”</p><p class="testimonial-copy-bn" style="display: none;">“আমি একটি নিরাপত্তা উদ্বেগ বেনামীভাবে রিপোর্ট করি এবং সমাধান না হওয়া পর্যন্ত অগ্রগতি স্পষ্টভাবে দেখতে পেরেছি।”</p><cite>— Anonymous Student</cite></article>
+                <article class="testimonial-item"><p class="testimonial-copy-en">“The token-based system made follow-up much easier than asking multiple offices in person.”</p><p class="testimonial-copy-bn" style="display: none;">“টোকেন-ভিত্তিক সিস্টেমটি একাধিক অফিসে সরাসরি জিজ্ঞাসা করার চেয়ে ফলো-আপ অনেক সহজ করেছে।”</p><cite>— Faculty Member</cite></article>
+                <article class="testimonial-item"><p class="testimonial-copy-en">“It feels more professional and trustworthy because status updates are visible and structured.”</p><p class="testimonial-copy-bn" style="display: none;">“এটি আরও পেশাদার এবং নির্ভরযোগ্য মনে হয় কারণ স্ট্যাটাস আপডেটগুলো দৃশ্যমান এবং সুশৃঙ্খল।”</p><cite>— Guardian</cite></article>
             </div>
         </div>
     </section>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="site-footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h4>
-                        <span class="footer-about-en">About</span>
-                        <span class="footer-about-bn" style="display: none;">পরিচিতি</span>
-                    </h4>
-                    <p>
-                        <span class="footer-about-text-en">DIU Campus Governance System ensures transparent, anonymous, and accountable issue resolution.</span>
-                        <span class="footer-about-text-bn" style="display: none;">ডিআইইউ ক্যাম্পাস গভর্নেন্স সিস্টেম স্বচ্ছ, বেনামী এবং জবাবদিহিমূলক সমস্যা সমাধান নিশ্চিত করে।</span>
-                    </p>
+                    <h4 class="footer-about-en">About</h4>
+                    <h4 class="footer-about-bn" style="display: none;">পরিচিতি</h4>
+                    <p class="footer-about-text-en">DIU Campus Governance System promotes transparent, secure, and accountable issue handling for students, staff, and the broader university community.</p>
+                    <p class="footer-about-text-bn" style="display: none;">ডিআইইউ ক্যাম্পাস গভর্নেন্স সিস্টেম শিক্ষার্থী, কর্মী এবং বৃহত্তর বিশ্ববিদ্যালয় কমিউনিটির জন্য স্বচ্ছ, নিরাপদ এবং জবাবদিহিমূলক সমস্যা ব্যবস্থাপনা নিশ্চিত করে।</p>
                 </div>
                 <div class="footer-col">
-                    <h4>
-                        <span class="footer-links-en">Quick Links</span>
-                        <span class="footer-links-bn" style="display: none;">দ্রুত লিংক</span>
-                    </h4>
+                    <h4 class="footer-links-en">Quick Links</h4>
+                    <h4 class="footer-links-bn" style="display: none;">দ্রুত লিংক</h4>
                     <ul>
-                        <li><a href="report.html">
-                            <span class="footer-report-en">Submit Report</span>
-                            <span class="footer-report-bn" style="display: none;">রিপোর্ট জমা দিন</span>
-                        </a></li>
-                        <li><a href="track.html">
-                            <span class="footer-track-en">Track Report</span>
-                            <span class="footer-track-bn" style="display: none;">রিপোর্ট ট্র্যাক করুন</span>
-                        </a></li>
-                        <li><a href="dashboard.html">Dashboard</a></li>
+                        <li><a href="report.html"><span class="footer-report-en">Submit Report</span><span class="footer-report-bn" style="display: none;">রিপোর্ট জমা দিন</span></a></li>
+                        <li><a href="track.html"><span class="footer-track-en">Track Report</span><span class="footer-track-bn" style="display: none;">রিপোর্ট ট্র্যাক করুন</span></a></li>
+                        <li><a href="public-analytics.html">Public Analytics</a></li>
+                        <li><a href="admin/dashboard.php">Admin Panel</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
-                    <h4>Contact</h4>
+                    <h4 class="footer-contact-en">Contact</h4>
+                    <h4 class="footer-contact-bn" style="display: none;">যোগাযোগ</h4>
                     <p>Daffodil International University</p>
-                    <p>Daffodil Smart City, Savar</p>
-                    <p>Dhaka, Bangladesh</p>
+                    <p>Daffodil Smart City, Birulia, Savar, Dhaka</p>
+                    <p>Email: support@diu.edu.bd</p>
+                    <p>Web: diu.edu.bd</p>
                 </div>
             </div>
-            <div class="footer-bottom">
-                <p>© 2026 DIU Campus Governance System | Team Nexus</p>
-                <p class="footer-tagline">Anonymous · Secure · Accountable</p>
-            </div>
+            <div class="footer-bottom"><p>© 2026 DIU Campus Governance System</p><p class="footer-tagline"><span class="tagline-en">Anonymous · Secure · Accountable</span><span class="tagline-bn" style="display: none;">বেনামী · নিরাপদ · জবাবদিহিমূলক</span></p></div>
         </div>
     </footer>
 
-    <!-- ===== MODALS ===== -->
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
+    <div class="modal" id="reportModal" aria-hidden="true">
+        <div class="modal-overlay" onclick="closeModal('reportModal')"></div>
+        <div class="modal-content modal-content-lg">
+            <div class="modal-header">
+                <div>
+                    <h3 class="modal-title-en">Quick anonymous report</h3>
+                    <h3 class="modal-title-bn" style="display: none;">দ্রুত বেনামী রিপোর্ট</h3>
+                    <p class="modal-subtitle-en">Fast submission from the homepage</p>
+                    <p class="modal-subtitle-bn" style="display: none;">হোমপেজ থেকে দ্রুত জমা</p>
+                </div>
+                <button class="modal-close" type="button" onclick="closeModal('reportModal')" aria-label="Close modal">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="error-message" id="quickReportError" style="display: none;"></div>
+                <form id="quickReportForm" novalidate>
+                    <div class="form-grid two-col">
+                        <div class="form-group">
+                            <label for="quickCategory"><span class="label-en">Category</span><span class="label-bn" style="display: none;">বিভাগ</span><span class="required">*</span></label>
+                            <select id="quickCategory" required>
+                                <option value="">Select category</option>
+                                <option value="academic">Academic</option>
+                                <option value="facility">Facility</option>
+                                <option value="transport">Transport</option>
+                                <option value="security">Security</option>
+                                <option value="harassment">Harassment</option>
+                                <option value="it">IT Services</option>
+                                <option value="admin">Administrative</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="quickLocation"><span class="label-en">Location</span><span class="label-bn" style="display: none;">অবস্থান</span></label>
+                            <input type="text" id="quickLocation" placeholder="Where did this happen?" maxlength="120" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="quickTitle"><span class="label-en">Title</span><span class="label-bn" style="display: none;">শিরোনাম</span><span class="required">*</span></label>
+                        <input type="text" id="quickTitle" placeholder="Brief summary of the issue" maxlength="100" required />
+                    </div>
+                    <div class="form-group">
+                        <label for="quickDescription"><span class="label-en">Description</span><span class="label-bn" style="display: none;">বিবরণ</span><span class="required">*</span></label>
+                        <textarea id="quickDescription" rows="5" placeholder="Describe the incident clearly..." required></textarea>
+                    </div>
+                    <div class="anonymous-notice"><i class="fas fa-user-secret"></i><p class="anon-en">You are posting anonymously. Your identity is protected in this quick flow.</p><p class="anon-bn" style="display: none;">আপনি বেনামীভাবে পোস্ট করছেন। এই দ্রুত ফ্লোতে আপনার পরিচয় সুরক্ষিত থাকবে।</p></div>
+                    <button type="submit" class="submit-btn" id="quickSubmitBtn"><span class="submit-label-en">Submit Report</span><span class="submit-label-bn" style="display: none;">রিপোর্ট জমা দিন</span></button>
+                </form>
+                <div class="modal-footer-link"><a href="report.html"><span class="full-form-en">Use the full form with evidence upload →</span><span class="full-form-bn" style="display: none;">এভিডেন্স আপলোডসহ পূর্ণ ফর্ম ব্যবহার করুন →</span></a></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="loginModal" aria-hidden="true">
         <div class="modal-overlay" onclick="closeModal('loginModal')"></div>
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>Sign In</h3>
-                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
-            </div>
+            <div class="modal-header"><div><h3 class="login-title-en">Sign in</h3><h3 class="login-title-bn" style="display: none;">সাইন ইন</h3></div><button class="modal-close" type="button" onclick="closeModal('loginModal')" aria-label="Close modal">&times;</button></div>
             <div class="modal-body">
-                <form id="loginForm" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label>Email / Username</label>
-                        <input type="text" id="loginEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Sign In</button>
+                <form id="loginForm" novalidate>
+                    <div class="form-group"><label for="loginEmail"><span class="login-email-en">Email / Username</span><span class="login-email-bn" style="display: none;">ইমেইল / ইউজারনেম</span></label><input type="text" id="loginEmail" required /></div>
+                    <div class="form-group"><label for="loginPassword"><span class="login-password-en">Password</span><span class="login-password-bn" style="display: none;">পাসওয়ার্ড</span></label><input type="password" id="loginPassword" required /></div>
+                    <button type="submit" class="submit-btn" id="loginSubmitBtn"><span class="login-submit-en">Sign In</span><span class="login-submit-bn" style="display: none;">সাইন ইন</span></button>
                 </form>
-                <div class="modal-switch">
-                    Don't have an account? <a href="#" onclick="switchModal('loginModal', 'registerModal')">Sign Up</a>
-                </div>
+                <div class="modal-switch"><span class="switch-en">Don't have an account?</span><span class="switch-bn" style="display: none;">অ্যাকাউন্ট নেই?</span><a href="#" onclick="switchModal('loginModal', 'registerModal'); return false;"><span class="switch-link-en">Sign Up</span><span class="switch-link-bn" style="display: none;">সাইন আপ</span></a></div>
             </div>
         </div>
     </div>
 
-    <!-- Register Modal -->
-    <div class="modal" id="registerModal">
+    <div class="modal" id="registerModal" aria-hidden="true">
         <div class="modal-overlay" onclick="closeModal('registerModal')"></div>
         <div class="modal-content">
-            <div class="modal-header">
-                <h3>Create Account</h3>
-                <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
-            </div>
+            <div class="modal-header"><div><h3 class="register-title-en">Create account</h3><h3 class="register-title-bn" style="display: none;">অ্যাকাউন্ট তৈরি করুন</h3></div><button class="modal-close" type="button" onclick="closeModal('registerModal')" aria-label="Close modal">&times;</button></div>
             <div class="modal-body">
-                <form id="registerForm" onsubmit="handleRegister(event)">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="regName" required>
+                <form id="registerForm" novalidate>
+                    <div class="form-group"><label for="regName"><span class="reg-name-en">Full Name</span><span class="reg-name-bn" style="display: none;">পূর্ণ নাম</span></label><input type="text" id="regName" required /></div>
+                    <div class="form-group"><label for="regUsername"><span class="reg-name-en">Username</span><span class="reg-name-bn" style="display: none;">ইউজারনেম</span></label><input type="text" id="regUsername" required /></div>
+                    <div class="form-group"><label for="regEmail"><span class="reg-email-en">Email</span><span class="reg-email-bn" style="display: none;">ইমেইল</span></label><input type="email" id="regEmail" required /></div>
+                    <div class="form-grid two-col">
+                        <div class="form-group">
+                            <label for="regRole"><span class="reg-role-en">Role</span><span class="reg-role-bn" style="display: none;">ভূমিকা</span></label>
+                            <select id="regRole">
+                                <option value="student">Student</option>
+                                <option value="faculty">Faculty</option>
+                                <option value="department_head">Department Head</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="regDepartmentId"><span class="reg-dept-en">Department ID (optional)</span><span class="reg-dept-bn" style="display: none;">ডিপার্টমেন্ট আইডি (ঐচ্ছিক)</span></label>
+                            <input type="number" id="regDepartmentId" min="1" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="regEmail" required>
+                    <div class="form-grid two-col">
+                        <div class="form-group"><label for="regPhone"><span class="reg-pass-en">Phone (optional)</span><span class="reg-pass-bn" style="display: none;">ফোন (ঐচ্ছিক)</span></label><input type="text" id="regPhone" /></div>
+                        <div class="form-group"></div>
                     </div>
-                    <div class="form-group">
-                        <label>Role</label>
-                        <select id="regRole">
-                            <option value="student">Student</option>
-                            <option value="faculty">Faculty</option>
-                            <option value="staff">Staff</option>
-                        </select>
+                    <div class="form-grid two-col">
+                        <div class="form-group"><label for="regPassword"><span class="reg-pass-en">Password</span><span class="reg-pass-bn" style="display: none;">পাসওয়ার্ড</span></label><input type="password" id="regPassword" required /></div>
+                        <div class="form-group"><label for="regConfirmPassword"><span class="reg-confirm-en">Confirm Password</span><span class="reg-confirm-bn" style="display: none;">পাসওয়ার্ড নিশ্চিত করুন</span></label><input type="password" id="regConfirmPassword" required /></div>
                     </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" id="regPassword" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Confirm Password</label>
-                        <input type="password" id="regConfirmPassword" required>
-                    </div>
-                    <button type="submit" class="submit-btn">Create Account</button>
+                    <button type="submit" class="submit-btn" id="registerSubmitBtn"><span class="register-submit-en">Create Account</span><span class="register-submit-bn" style="display: none;">অ্যাকাউন্ট তৈরি করুন</span></button>
                 </form>
-                <div class="modal-switch">
-                    Already have an account? <a href="#" onclick="switchModal('registerModal', 'loginModal')">Sign In</a>
-                </div>
+                <div class="modal-switch"><span class="register-switch-en">Already have an account?</span><span class="register-switch-bn" style="display: none;">ইতিমধ্যে অ্যাকাউন্ট আছে?</span><a href="#" onclick="switchModal('registerModal', 'loginModal'); return false;"><span class="register-switch-link-en">Sign In</span><span class="register-switch-link-bn" style="display: none;">সাইন ইন</span></a></div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Report Modal -->
-    <div class="modal" id="reportModal">
-        <div class="modal-overlay" onclick="closeModal('reportModal')"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Quick Report</h3>
-                <button class="modal-close" onclick="closeModal('reportModal')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div id="quickReportError" style="color: var(--accent-danger); margin-bottom: 15px; display: none;"></div>
-                <form id="quickReportForm">
-                    <div class="form-group">
-                        <label>Category <span class="required">*</span></label>
-                        <select id="quickCategory" required>
-                            <option value="">Select category</option>
-                            <option value="academic">📚 Academic</option>
-                            <option value="facility">🏫 Facility</option>
-                            <option value="transport">🚌 Transport</option>
-                            <option value="security">🛡️ Security</option>
-                            <option value="harassment">⚖️ Harassment</option>
-                            <option value="it">💻 IT Services</option>
-                            <option value="admin">🧾 Administrative</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Title <span class="required">*</span></label>
-                        <input type="text" id="quickTitle" placeholder="Brief summary" required maxlength="100">
-                    </div>
-                    <div class="form-group">
-                        <label>Description <span class="required">*</span></label>
-                        <textarea id="quickDescription" rows="3" placeholder="Brief description..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Location</label>
-                        <input type="text" id="quickLocation" placeholder="Where did this happen?">
-                    </div>
-                    <div class="anonymous-notice">
-                        <p>✅ You are posting anonymously. Your identity is protected.</p>
-                    </div>
-                    <button type="submit" class="submit-btn" id="quickSubmitBtn">Submit Report →</button>
-                </form>
-                <div class="modal-footer-link">
-                    <a href="report.html">Use full form with evidence upload →</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- JavaScript - SINGLE VERSION (cleaned up) -->
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/main.js"></script>
-    <script>
-        // ===== CONFIGURATION =====
-        const API_BASE = 'http://localhost:8080/api';
+   <script>
+        const API_BASE = `${window.location.origin}/api`;
+        const ADMIN_DASHBOARD_URL = `${window.location.origin}/frontend/admin/dashboard.php`;
+
+
         let isSubmitting = false;
         let currentLanguage = localStorage.getItem('cgs_language') || 'en';
+        let currentCategory = 'all';
+        let currentSearchQuery = '';
+        let latestReportsCache = [];
+        let isShowingAllReports = false;
+        const HOME_REPORT_LIMIT = 6;
 
-        // ===== THEME TOGGLE =====
-        window.toggleTheme = function() {
+        function qs(selector, scope = document) { return scope.querySelector(selector); }
+        function qsa(selector, scope = document) { return Array.from(scope.querySelectorAll(selector)); }
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+        function normalizeText(value) { return String(value || '').trim().toLowerCase(); }
+        function closeEmergencyBanner() { const banner = document.getElementById('emergencyBanner'); if (banner) banner.style.display = 'none'; }
+        function mapStatusClass(status) {
+            const normalized = normalizeText(status);
+            if (normalized.includes('verified')) return 'status-verified';
+            if (normalized.includes('resolved')) return 'status-resolved';
+            if (normalized.includes('progress') || normalized.includes('assigned')) return 'status-progress';
+            return 'status-pending';
+        }
+        function prettifyStatus(status) {
+            const normalized = normalizeText(status);
+            if (!normalized) return 'Pending';
+            return normalized.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+        }
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3200);
+        }
+        function setThemeIcon(theme) {
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+        window.toggleTheme = function () {
             const body = document.body;
-            const themeIcon = document.getElementById('themeIcon');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.setAttribute('data-theme', 'light');
-                themeIcon.className = 'fas fa-sun';
-                localStorage.setItem('cgs_theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                themeIcon.className = 'fas fa-moon';
-                localStorage.setItem('cgs_theme', 'dark');
-            }
+            const nextTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', nextTheme);
+            localStorage.setItem('cgs_theme', nextTheme);
+            setThemeIcon(nextTheme);
         };
-
-        // Load saved theme
-        const savedTheme = localStorage.getItem('cgs_theme') || 'dark';
-        document.body.setAttribute('data-theme', savedTheme);
-        document.getElementById('themeIcon').className = savedTheme === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
-
-        // ===== LANGUAGE TOGGLE =====
-        window.setLanguage = function(lang) {
+        function loadSavedTheme() {
+            const savedTheme = localStorage.getItem('cgs_theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            setThemeIcon(savedTheme);
+        }
+        function inferDisplayValue(el) {
+            const tag = el.tagName.toLowerCase();
+            if (['div','p','h1','h2','h3','h4','article'].includes(tag)) return 'block';
+            return 'inline';
+        }
+        window.setLanguage = function (lang) {
             currentLanguage = lang;
             localStorage.setItem('cgs_language', lang);
-            
-            // Update active button
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                if (btn.getAttribute('data-lang') === lang) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
+            qsa('.lang-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.lang === lang));
+            qsa('[class$="-en"]').forEach(el => { el.style.display = lang === 'en' ? inferDisplayValue(el) : 'none'; });
+            qsa('[class$="-bn"]').forEach(el => { el.style.display = lang === 'bn' ? inferDisplayValue(el) : 'none'; });
+            const searchInput = document.getElementById('searchReports');
+            if (searchInput) searchInput.placeholder = lang === 'bn' ? 'শিরোনাম, অবস্থান, টোকেন বা স্ট্যাটাস দিয়ে অনুসন্ধান করুন...' : 'Search reports by title, location, token, or status...';
+            updateToggleReportsButton(latestReportsCache.length ? filterReports(latestReportsCache).length : 0);
+        };
+        window.openModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            modal.classList.add('show');
+            modal.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeModal = function (modalId) {
+            const modal = document.getElementById(modalId);
+            if (!modal) return;
+            modal.classList.remove('show');
+            modal.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+            const errorDiv = document.getElementById('quickReportError');
+            if (errorDiv) { errorDiv.textContent = ''; errorDiv.style.display = 'none'; }
+        };
+        window.switchModal = function (closeId, openId) { closeModal(closeId); openModal(openId); };
+
+        function saveAuthSession(user) {
+            sessionStorage.setItem('cgs_logged_in', 'true');
+            sessionStorage.setItem('cgs_user', JSON.stringify(user));
+        }
+
+        function updateAuthUI() {
+            const isLoggedIn = sessionStorage.getItem('cgs_logged_in') === 'true';
+            const userData = JSON.parse(sessionStorage.getItem('cgs_user') || 'null');
+            const loggedOutView = document.getElementById('loggedOutView');
+            const loggedInView = document.getElementById('loggedInView');
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            if (!loggedOutView || !loggedInView) return;
+
+            if (isLoggedIn && userData) {
+                loggedOutView.style.display = 'none';
+                loggedInView.style.display = 'flex';
+                if (userNameDisplay) {
+                    if (userData.role === 'admin') userNameDisplay.textContent = 'Admin';
+                    else if (userData.role === 'faculty') userNameDisplay.textContent = `Dr. ${String(userData.name || 'Faculty').split(' ')[0]}`;
+                    else userNameDisplay.textContent = String(userData.name || 'User').split(' ')[0];
                 }
-            });
-            
-            // Show/hide language-specific elements
-            if (lang === 'bn') {
-                // Hide English, show Bengali
-                document.querySelectorAll('[class$="-en"]').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('[class$="-bn"]').forEach(el => el.style.display = 'inline');
-                document.querySelectorAll('.stat-label-en').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('.stat-label-bn').forEach(el => el.style.display = 'inline');
+                const userMenu = document.getElementById('userMenu');
+                if (userMenu) {
+                    qsa('a', userMenu).forEach(link => {
+                        const key = link.dataset.menu || '';
+                        if (key === 'admin-panel') link.style.display = (userData.role === 'admin' || userData.role === 'faculty') ? 'flex' : 'none';
+                        else link.style.display = 'flex';
+                    });
+                }
             } else {
-                // Show English, hide Bengali
-                document.querySelectorAll('[class$="-en"]').forEach(el => el.style.display = 'inline');
-                document.querySelectorAll('[class$="-bn"]').forEach(el => el.style.display = 'none');
-                document.querySelectorAll('.stat-label-en').forEach(el => el.style.display = 'inline');
-                document.querySelectorAll('.stat-label-bn').forEach(el => el.style.display = 'none');
+                loggedOutView.style.display = 'flex';
+                loggedInView.style.display = 'none';
+            }
+        }
+
+
+        async function restoreAuthFromBackend() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                const data = await response.json().catch(() => null);
+                if (response.ok && data?.success && data?.data) {
+                    const backendUser = data.data;
+                    const user = {
+                        id: backendUser.id ?? null,
+                        name: backendUser.full_name || backendUser.username || 'User',
+                        email: backendUser.email || '',
+                        role: backendUser.role || 'student',
+                        department_id: backendUser.department_id ?? null
+                    };
+                    saveAuthSession(user);
+                }
+            } catch (error) {
+                console.warn('Auth restore skipped:', error);
+            }
+        }
+        window.toggleUserMenu = function () {
+            const menu = document.getElementById('userMenu');
+            if (!menu) return;
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        };
+
+        window.logout = async function () {
+            try {
+                await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
+            } catch (error) {
+                console.warn('Logout request failed:', error);
+            }
+            sessionStorage.removeItem('cgs_logged_in');
+            sessionStorage.removeItem('cgs_user');
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu) userMenu.style.display = 'none';
+            updateAuthUI();
+            showToast(currentLanguage === 'bn' ? 'সফলভাবে লগআউট হয়েছে' : 'Logged out successfully', 'success');
+        };
+
+        window.handleLogin = async function (e) {
+            e.preventDefault();
+            const login = document.getElementById('loginEmail')?.value.trim();
+            const password = document.getElementById('loginPassword')?.value;
+            const submitBtn = document.getElementById('loginSubmitBtn');
+
+            if (!login || !password) {
+                showToast(currentLanguage === 'bn' ? 'সব ঘর পূরণ করুন' : 'Please fill in all fields', 'error');
+                return;
+            }
+
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = currentLanguage === 'bn' ? 'সাইন ইন হচ্ছে...' : 'Signing in...';
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ login, password })
+                });
+
+                const data = await response.json().catch(() => null);
+                if (!response.ok || !data?.success || !data?.data?.user) {
+                    throw new Error(data?.message || 'Invalid credentials');
+                }
+
+                const backendUser = data.data.user;
+                const user = {
+                    id: backendUser.id ?? null,
+                    name: backendUser.full_name || backendUser.username || login,
+                    email: backendUser.email || '',
+                    role: backendUser.role || 'student',
+                    department_id: backendUser.department_id ?? null
+                };
+
+                saveAuthSession(user);
+                closeModal('loginModal');
+                updateAuthUI();
+                showToast(currentLanguage === 'bn' ? 'সফলভাবে সাইন ইন হয়েছে' : 'Signed in successfully', 'success');
+
+                if (user.role === 'admin' || user.role === 'faculty') {
+                    window.location.href = ADMIN_DASHBOARD_URL;
+                } else {
+                    window.location.href = '/frontend/dashboard.html';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast(currentLanguage === 'bn' ? 'লগইন ব্যর্থ হয়েছে' : (error.message || 'Login failed'), 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
             }
         };
 
-        // ===== STATS FUNCTIONS =====
+        window.handleRegister = async function (e) {
+            e.preventDefault();
+
+            const name = document.getElementById('regName')?.value.trim();
+            const email = document.getElementById('regEmail')?.value.trim();
+            const rawRole = document.getElementById('regRole')?.value || 'student';
+            const department = document.getElementById('regDepartmentId')?.value?.trim() || '';
+            const phone = document.getElementById('regPhone')?.value?.trim() || '';
+            const password = document.getElementById('regPassword')?.value;
+            const confirm = document.getElementById('regConfirmPassword')?.value;
+            const submitBtn = document.getElementById('registerSubmitBtn');
+
+            if (!name || !email || !password || !confirm) {
+                showToast(currentLanguage === 'bn' ? 'প্রয়োজনীয় সব তথ্য দিন' : 'Please fill in all required fields', 'error');
+                return;
+            }
+            if (password !== confirm) {
+                showToast(currentLanguage === 'bn' ? 'পাসওয়ার্ড মিলছে না' : 'Passwords do not match', 'error');
+                return;
+            }
+            if (password.length < 8) {
+                showToast(currentLanguage === 'bn' ? 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে' : 'Password must be at least 8 characters', 'error');
+                return;
+            }
+
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = currentLanguage === 'bn' ? 'অ্যাকাউন্ট তৈরি হচ্ছে...' : 'Creating account...';
+
+            try {
+                const mappedRole = (rawRole === 'department' || rawRole === 'department_head') ? 'admin' : rawRole;
+                const username = (email.split('@')[0] || 'user').toLowerCase().replace(/[^a-z0-9._-]/g, '').slice(0, 50) || `user${Date.now()}`;
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                        full_name: name,
+                        role: mappedRole,
+                        department_id: department ? Number(department) : null,
+                        phone
+                    })
+                });
+
+                const data = await response.json().catch(() => null);
+                if (!response.ok || !data?.success || !data?.data) {
+                    throw new Error(data?.message || 'Registration failed');
+                }
+
+                const backendUser = data.data.user || data.data;
+                const user = {
+                    id: backendUser.id ?? null,
+                    name: backendUser.full_name || name,
+                    email: backendUser.email || email,
+                    role: backendUser.role || mappedRole,
+                    department: department || ''
+                };
+
+                saveAuthSession(user);
+                document.getElementById('registerForm')?.reset();
+                closeModal('registerModal');
+                updateAuthUI();
+                showToast(currentLanguage === 'bn' ? 'অ্যাকাউন্ট তৈরি হয়েছে' : 'Account created successfully', 'success');
+
+                if (user.role === 'admin' || user.role === 'faculty') {
+                    window.location.href = ADMIN_DASHBOARD_URL;
+                } else {
+                    window.location.href = '/frontend/dashboard.html';
+                }
+            } catch (error) {
+                console.error('Register error:', error);
+                showToast(currentLanguage === 'bn' ? 'রেজিস্ট্রেশন ব্যর্থ হয়েছে' : (error.message || 'Registration failed'), 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+            }
+        };
+
         async function fetchStats() {
             try {
                 const response = await fetch(`${API_BASE}/stats`);
                 const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('totalReports').textContent = data.data.total_reports || 0;
-                    document.getElementById('verifiedReports').textContent = data.data.verified_reports || 0;
-                    document.getElementById('pendingReports').textContent = data.data.pending_reports || 0;
-                    document.getElementById('resolvedReports').textContent = data.data.resolved_reports || 0;
-                }
+                if (!data.success || !data.data) throw new Error('Invalid stats response');
+                document.getElementById('totalReports').textContent = data.data.total_reports ?? 0;
+                document.getElementById('verifiedReports').textContent = data.data.verified_reports ?? 0;
+                document.getElementById('pendingReports').textContent = data.data.pending_reports ?? 0;
+                document.getElementById('resolvedReports').textContent = data.data.resolved_reports ?? 0;
             } catch (error) {
                 console.error('Failed to fetch stats:', error);
+                ['totalReports','verifiedReports','pendingReports','resolvedReports'].forEach(id => {
+                    const el = document.getElementById(id); if (el) el.textContent = '0';
+                });
             }
         }
 
-        // ===== REPORTS FUNCTIONS =====
         async function fetchLatestReports() {
             try {
                 const response = await fetch(`${API_BASE}/reports/latest`);
                 const data = await response.json();
-                
-                if (data.success && data.data.length > 0) {
-                    updateReportsList(data.data);
-                }
+                if (!data.success || !Array.isArray(data.data)) throw new Error('No latest reports available');
+                latestReportsCache = data.data;
+                applyFiltersAndRender();
             } catch (error) {
                 console.error('Failed to fetch reports:', error);
+                latestReportsCache = [];
+                applyFiltersAndRender();
             }
         }
 
-        function updateReportsList(reports) {
+        function getReportSearchHaystack(report) {
+            return [report.title, report.location, report.status, report.category, report.token, report.fullToken].map(normalizeText).join(' ');
+        }
+        function isHomepagePreferredStatus(report) {
+            const normalized = normalizeText(report.status);
+            return normalized.includes('verified') || normalized.includes('resolved');
+        }
+        function filterReports(reports) {
+            return reports.filter(report => {
+                const reportCategory = normalizeText(report.category);
+                const haystack = getReportSearchHaystack(report);
+                const categoryPass = currentCategory === 'all' || reportCategory === currentCategory;
+                const searchPass = !currentSearchQuery || haystack.includes(currentSearchQuery);
+                return categoryPass && searchPass;
+            });
+        }
+        function sortReportsForHomepage(reports) {
+            return [...reports].sort((a, b) => {
+                const aPreferred = isHomepagePreferredStatus(a) ? 1 : 0;
+                const bPreferred = isHomepagePreferredStatus(b) ? 1 : 0;
+                if (aPreferred !== bPreferred) return bPreferred - aPreferred;
+                const aTime = new Date(a.created_at || a.createdAt || 0).getTime();
+                const bTime = new Date(b.created_at || b.createdAt || 0).getTime();
+                return bTime - aTime;
+            });
+        }
+        function getVisibleReports(reports) {
+            const prioritized = sortReportsForHomepage(reports);
+            return isShowingAllReports ? prioritized : prioritized.slice(0, HOME_REPORT_LIMIT);
+        }
+        function updateToggleReportsButton(totalCount) {
+            const row = document.getElementById('viewMoreRow');
+            const icon = document.getElementById('toggleReportsIcon');
+            const textEn = document.getElementById('toggleReportsTextEn');
+            const textBn = document.getElementById('toggleReportsTextBn');
+            if (!row || !icon || !textEn || !textBn) return;
+            if (totalCount > HOME_REPORT_LIMIT) {
+                row.style.display = 'flex';
+                icon.className = isShowingAllReports ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+                textEn.textContent = isShowingAllReports ? 'Show Less Reports' : 'View More Reports';
+                textBn.textContent = isShowingAllReports ? 'কম রিপোর্ট দেখুন' : 'আরও রিপোর্ট দেখুন';
+                textEn.style.display = currentLanguage === 'en' ? 'inline' : 'none';
+                textBn.style.display = currentLanguage === 'bn' ? 'inline' : 'none';
+            } else row.style.display = 'none';
+        }
+        window.toggleReportsView = function () { isShowingAllReports = !isShowingAllReports; applyFiltersAndRender(); };
+
+        function renderReports(reports) {
             const reportsList = document.getElementById('reportsList');
             if (!reportsList) return;
-            
-            reportsList.innerHTML = reports.map(report => {
-                let statusClass = 'status-pending';
-                if (report.status === 'verified') statusClass = 'status-verified';
-                else if (report.status === 'resolved') statusClass = 'status-resolved';
-                
+            updateToggleReportsButton(reports.length);
+            const visibleReports = getVisibleReports(reports);
+            if (!visibleReports.length) {
+                reportsList.innerHTML = `
+                    <div class="report-empty-state glass-card">
+                        <div class="empty-icon"><i class="fas fa-folder-open"></i></div>
+                        <h4 class="empty-en" style="${currentLanguage === 'en' ? '' : 'display:none;'}">No matching reports found</h4>
+                        <h4 class="empty-bn" style="${currentLanguage === 'bn' ? '' : 'display:none;'}">মিল থাকা কোনো রিপোর্ট পাওয়া যায়নি</h4>
+                        <p class="empty-sub-en" style="${currentLanguage === 'en' ? '' : 'display:none;'}">Try a different search or category filter.</p>
+                        <p class="empty-sub-bn" style="${currentLanguage === 'bn' ? '' : 'display:none;'}">অন্য অনুসন্ধান বা বিভাগ ফিল্টার চেষ্টা করুন।</p>
+                    </div>`;
+                return;
+            }
+            reportsList.innerHTML = visibleReports.map(report => {
+                const rawCategory = normalizeText(report.category) || 'general';
+                const categoryLabel = rawCategory.charAt(0).toUpperCase() + rawCategory.slice(1);
+                const token = report.fullToken || report.token || '';
+                const title = report.title || 'Untitled report';
+                const location = report.location || 'Not specified';
+                const statusText = prettifyStatus(report.status);
+                const statusClass = mapStatusClass(report.status);
                 return `
-                <div class="report-item" onclick="window.location.href='track.html?token=${report.fullToken || report.token}'">
-                    <div class="report-header">
-                        <span class="report-category">${report.category || 'Other'}</span>
-                        <span class="report-status ${statusClass}">${report.status || 'pending'}</span>
-                    </div>
-                    <p class="report-excerpt">${(report.title || '').substring(0, 100)}...</p>
-                    <div class="report-meta">
-                        <span>📍 ${report.location || 'Not specified'}</span>
-                        <span>🕒 ${report.timeAgo || 'recently'}</span>
-                        <span class="report-token-hint">Token: ${report.token || ''}</span>
-                    </div>
-                </div>
-            `}).join('');
+                    <article class="report-item glass-card" data-category="${escapeHtml(rawCategory)}" tabindex="0" onclick="goToTrack('${escapeHtml(token)}')" onkeypress="handleReportKeypress(event, '${escapeHtml(token)}')">
+                        <div class="report-header">
+                            <span class="report-category">${escapeHtml(categoryLabel)}</span>
+                            <span class="report-status ${statusClass}">${escapeHtml(statusText)}</span>
+                        </div>
+                        <h4 class="report-title">${escapeHtml(title)}</h4>
+                        <p class="report-excerpt">${escapeHtml(title.length > 140 ? title.slice(0, 140) + '…' : title)}</p>
+                        <div class="report-meta"><span><i class="fas fa-location-dot"></i> ${escapeHtml(location)}</span><span><i class="fas fa-clock"></i> ${escapeHtml(report.timeAgo || 'recently')}</span></div>
+                        <div class="report-footer-row"><span class="report-token-hint">Token: ${escapeHtml(report.token || token)}</span><span class="report-link-text"><span class="track-link-en" style="${currentLanguage === 'en' ? '' : 'display:none;'}">Track →</span><span class="track-link-bn" style="${currentLanguage === 'bn' ? '' : 'display:none;'}">ট্র্যাক →</span></span></div>
+                    </article>`;
+            }).join('');
+        }
+        function applyFiltersAndRender() { renderReports(filterReports(latestReportsCache)); }
+        function setupCategoryFilter() {
+            qsa('.chip').forEach(chip => {
+                chip.addEventListener('click', () => {
+                    qsa('.chip').forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentCategory = chip.dataset.cat || 'all';
+                    isShowingAllReports = false;
+                    applyFiltersAndRender();
+                });
+            });
+        }
+        function setupSearch() {
+            const searchInput = document.getElementById('searchReports');
+            const searchBtn = document.querySelector('.search-btn');
+            const clearSearchBtn = document.getElementById('clearSearchBtn');
+            if (!searchInput || !searchBtn || !clearSearchBtn) return;
+            const performSearch = () => { currentSearchQuery = normalizeText(searchInput.value); isShowingAllReports = false; applyFiltersAndRender(); };
+            searchBtn.addEventListener('click', performSearch);
+            clearSearchBtn.addEventListener('click', () => { searchInput.value = ''; currentSearchQuery = ''; isShowingAllReports = false; applyFiltersAndRender(); searchInput.focus(); });
+            searchInput.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); performSearch(); }});
+            searchInput.addEventListener('input', () => { currentSearchQuery = normalizeText(searchInput.value); isShowingAllReports = false; applyFiltersAndRender(); });
+        }
+        function startTestimonialSlider() {
+            const testimonialItems = qsa('.testimonial-item');
+            if (!testimonialItems.length) return;
+            let currentIndex = 0;
+            setInterval(() => {
+                testimonialItems[currentIndex].classList.remove('active');
+                currentIndex = (currentIndex + 1) % testimonialItems.length;
+                testimonialItems[currentIndex].classList.add('active');
+            }, 5000);
+        }
+        function updateProgressBar() {
+            const progressBar = document.getElementById('progressBar');
+            if (!progressBar) return;
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const width = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            progressBar.style.width = `${width}%`;
         }
 
-        // ===== QUICK REPORT SUBMISSION =====
         async function submitQuickReport(formData) {
             const submitBtn = document.getElementById('quickSubmitBtn');
             const errorDiv = document.getElementById('quickReportError');
-            
-            if (isSubmitting) return false;
+            if (isSubmitting || !submitBtn) return false;
             isSubmitting = true;
-            
             const originalText = submitBtn.innerHTML;
-            submitBtn.innerHTML = 'Submitting...';
+            submitBtn.innerHTML = currentLanguage === 'bn' ? '<span class="loading-spinner"></span> জমা দেওয়া হচ্ছে...' : '<span class="loading-spinner"></span> Submitting...';
             submitBtn.disabled = true;
-            if (errorDiv) errorDiv.style.display = 'none';
-            
+            if (errorDiv) { errorDiv.textContent = ''; errorDiv.style.display = 'none'; }
+
             try {
-                const response = await fetch(`${API_BASE}/report/submit`, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    alert(`Report submitted! Token: ${data.data.token}`);
-                    
-                    const tokens = JSON.parse(localStorage.getItem('cgs_tokens') || '[]');
-                    tokens.push(data.data.token);
-                    if (tokens.length > 5) tokens.shift();
-                    localStorage.setItem('cgs_tokens', JSON.stringify(tokens));
-                    
-                    await fetchStats();
-                    await fetchLatestReports();
-                    
-                    closeModal('reportModal');
-                    document.getElementById('quickReportForm').reset();
-                    
-                    return true;
-                } else {
-                    if (errorDiv) {
-                        errorDiv.textContent = data.message || 'Submission failed';
-                        errorDiv.style.display = 'block';
-                    }
-                    return false;
+                const response = await fetch(`${API_BASE}/report/submit`, { method: 'POST', body: formData });
+                const data = await response.json().catch(() => null);
+                if (!response.ok || !data || !data.success || !data.data?.token) {
+                    throw new Error(data?.message || 'Submission failed');
                 }
+
+                const token = data.data.token;
+                const tokens = JSON.parse(localStorage.getItem('cgs_tokens') || '[]');
+                const updatedTokens = [token, ...tokens.filter(t => t !== token)].slice(0, 5);
+                localStorage.setItem('cgs_tokens', JSON.stringify(updatedTokens));
+
+                await fetchStats();
+                await fetchLatestReports();
+                closeModal('reportModal');
+                document.getElementById('quickReportForm')?.reset();
+                showToast(currentLanguage === 'bn' ? `রিপোর্ট জমা হয়েছে। টোকেন: ${token}` : `Report submitted successfully. Token: ${token}`, 'success');
+                return true;
             } catch (error) {
                 console.error('Submission error:', error);
                 if (errorDiv) {
-                    errorDiv.textContent = 'Network error. Is the server running?';
+                    errorDiv.textContent = currentLanguage === 'bn' ? 'সাবমিশন ব্যর্থ হয়েছে। সার্ভার চালু আছে কি না পরীক্ষা করুন।' : (error.message || 'Submission failed. Please check whether the server is running.');
                     errorDiv.style.display = 'block';
                 }
                 return false;
@@ -719,92 +970,64 @@
             }
         }
 
-        // ===== MODAL FUNCTIONS =====
-        window.openModal = function(modalId) {
-            document.getElementById(modalId)?.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        };
+        function setupQuickReportForm() {
+            const form = document.getElementById('quickReportForm');
+            if (!form) return;
+            form.addEventListener('submit', async event => {
+                event.preventDefault();
+                const category = document.getElementById('quickCategory')?.value;
+                const title = document.getElementById('quickTitle')?.value.trim();
+                const description = document.getElementById('quickDescription')?.value.trim();
+                const location = document.getElementById('quickLocation')?.value.trim() || '';
+                if (!category || !title || !description) {
+                    showToast(currentLanguage === 'bn' ? 'প্রয়োজনীয় ফিল্ড পূরণ করুন' : 'Please fill in all required fields', 'error');
+                    return;
+                }
+                const formData = new FormData();
+                formData.append('category', category);
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('location', location);
+                await submitQuickReport(formData);
+            });
+        }
 
-        window.closeModal = function(modalId) {
-            document.getElementById(modalId)?.classList.remove('show');
-            document.body.style.overflow = '';
-            const errorDiv = document.getElementById('quickReportError');
-            if (errorDiv) errorDiv.style.display = 'none';
+        window.goToTrack = function (token) {
+            if (!token) { window.location.href = '/frontend/track.html'; return; }
+            window.location.href = `/frontend/track.html?token=${encodeURIComponent(token)}`;
         };
-
-        window.switchModal = function(closeId, openId) {
-            closeModal(closeId);
-            openModal(openId);
+        window.handleReportKeypress = function (event, token) {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); goToTrack(token); }
         };
-
-        // ===== USER MENU =====
-        window.toggleUserMenu = function() {
-            const menu = document.getElementById('userMenu');
-            if (menu) {
-                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-            }
-        };
-
-        // Close user menu when clicking outside
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('userMenu');
-            if (menu && !e.target.closest('.user-menu-container') && menu.style.display === 'block') {
-                menu.style.display = 'none';
+        async function refreshHomeData() { await Promise.all([fetchStats(), fetchLatestReports()]); }
+        document.addEventListener('click', event => {
+            const userMenu = document.getElementById('userMenu');
+            if (userMenu && !event.target.closest('.user-menu-container')) userMenu.style.display = 'none';
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                qsa('.modal.show').forEach(modal => { modal.classList.remove('show'); modal.setAttribute('aria-hidden', 'true'); });
+                document.body.style.overflow = '';
+                const userMenu = document.getElementById('userMenu');
+                if (userMenu) userMenu.style.display = 'none';
             }
         });
-
-        // ===== PROGRESS BAR =====
-        window.addEventListener('scroll', function() {
-            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            const scrolled = (winScroll / height) * 100;
-            document.getElementById('progressBar').style.width = scrolled + '%';
-        });
-
-        // ===== EVENT LISTENERS =====
-        document.addEventListener('DOMContentLoaded', function() {
-            fetchStats();
-            fetchLatestReports();
-            
+        window.addEventListener('scroll', updateProgressBar);
+        document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+        document.getElementById('registerForm')?.addEventListener('submit', handleRegister);
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadSavedTheme();
+            await restoreAuthFromBackend();
+            updateAuthUI();
+            setLanguage(currentLanguage);
+            setupCategoryFilter();
+            setupSearch();
+            setupQuickReportForm();
+            startTestimonialSlider();
+            updateProgressBar();
+            await refreshHomeData();
             setInterval(fetchStats, 30000);
             setInterval(fetchLatestReports, 30000);
-            
-            const quickForm = document.getElementById('quickReportForm');
-            if (quickForm) {
-                quickForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const category = document.getElementById('quickCategory').value;
-                    const title = document.getElementById('quickTitle').value;
-                    const description = document.getElementById('quickDescription').value;
-                    
-                    if (!category || !title || !description) {
-                        alert('Please fill in all required fields');
-                        return;
-                    }
-                    
-                    const formData = new FormData();
-                    formData.append('category', category);
-                    formData.append('title', title);
-                    formData.append('description', description);
-                    formData.append('location', document.getElementById('quickLocation').value || '');
-                    
-                    await submitQuickReport(formData);
-                });
-            }
-            
-            // Set initial language
-            setLanguage(currentLanguage);
-        });
-
-        // Close on escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal.show').forEach(modal => {
-                    modal.classList.remove('show');
-                });
-                document.body.style.overflow = '';
-            }
         });
     </script>
 </body>

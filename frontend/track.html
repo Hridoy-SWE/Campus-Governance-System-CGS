@@ -1,566 +1,1123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Track Report - Campus Governance System</title>
-    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
     <style>
-        .track-page {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 0 20px;
+        .track-shell {
+            width: min(1120px, calc(100% - 40px));
+            margin: 32px auto 56px;
+            display: grid;
+            gap: 22px;
         }
-        
-        .track-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        
-        .track-header h1 {
-            font-size: 2.2rem;
-            color: var(--text-primary);
-            margin-bottom: 10px;
-        }
-        
-        .track-header p {
-            color: var(--text-secondary);
-        }
-        
-        .track-card {
+
+        .track-hero,
+        .track-form-card,
+        .track-info-card,
+        .result-card,
+        .timeline-card,
+        .status-guide-card,
+        .unavailable-card {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-card);
-            padding: 30px;
-            margin-bottom: 30px;
+            border: 1px solid var(--glass-border);
+            border-radius: 26px;
+            box-shadow: var(--shadow-lg), var(--shadow-inner);
+            position: relative;
+            overflow: hidden;
         }
-        
-        .token-input-group {
-            display: flex;
+
+        .track-hero::before,
+        .track-form-card::before,
+        .track-info-card::before,
+        .result-card::before,
+        .timeline-card::before,
+        .status-guide-card::before,
+        .unavailable-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 30%);
+            pointer-events: none;
+        }
+
+        .track-hero,
+        .track-form-card,
+        .track-info-card,
+        .result-card,
+        .timeline-card,
+        .status-guide-card,
+        .unavailable-card {
+            padding: 28px;
+        }
+
+        .track-hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+            gap: 22px;
+            align-items: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
             gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .token-input-group input {
-            flex: 1;
-            padding: 15px;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
+            min-height: 38px;
+            padding: 0 14px;
+            border-radius: 999px;
+            background: rgba(98, 227, 255, 0.10);
+            border: 1px solid rgba(98, 227, 255, 0.18);
             color: var(--text-primary);
-            font-family: monospace;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .hero-title {
+            font-size: clamp(2.1rem, 4vw, 3.2rem);
+            font-weight: 800;
+            line-height: 1.03;
+            margin-bottom: 14px;
+        }
+
+        .hero-title .lang-en,
+        .hero-title .lang-bn {
+            background: linear-gradient(135deg, #ffffff 0%, #dbe7ff 42%, #94ebff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        body[data-theme="light"] .hero-title .lang-en,
+        body[data-theme="light"] .hero-title .lang-bn {
+            background: linear-gradient(135deg, #1f2937 0%, #3563e9 48%, #1995c5 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-copy {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 62ch;
+        }
+
+        .hero-mini-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .hero-mini-item {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        body[data-theme="light"] .hero-mini-item {
+            background: #e9edf2;
+            border-color: rgba(198,205,216,0.86);
+        }
+
+        .hero-mini-item h4 {
             font-size: 1rem;
+            margin-bottom: 6px;
         }
-        
-        .token-input-group input:focus {
-            outline: none;
-            border-color: var(--accent-primary);
+
+        .hero-mini-item p {
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+            line-height: 1.55;
         }
-        
-        .recent-tokens {
-            background: var(--bg-surface);
-            border-radius: var(--radius);
+
+        .track-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(300px, 0.78fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .track-form-card h2,
+        .result-card h3,
+        .timeline-card h3,
+        .status-guide-card h3,
+        .track-info-card h3,
+        .unavailable-card h3 {
+            font-size: 1.12rem;
+            margin-bottom: 16px;
+        }
+
+        .track-form-highlight {
             padding: 20px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, rgba(124,156,255,0.12), rgba(98,227,255,0.06));
+            border: 1px solid rgba(124,156,255,0.18);
+            margin-bottom: 18px;
+        }
+
+        body[data-theme="light"] .track-form-highlight {
+            background: linear-gradient(135deg, rgba(53,99,233,0.08), rgba(25,149,197,0.04));
+            border-color: rgba(53,99,233,0.14);
+        }
+
+        .track-form-highlight h2 {
+            margin-bottom: 10px;
+            font-size: 1.35rem;
+        }
+
+        .track-form-highlight p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .track-form-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .token-input-shell {
+            position: relative;
+        }
+
+        .token-input-shell i {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .token-input-shell input {
+            min-height: 58px;
+            padding-left: 48px;
+            font-size: 1rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .track-note {
+            margin-top: 12px;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .saved-token-area {
             margin-top: 20px;
         }
-        
-        .recent-tokens h3 {
+
+        .saved-token-title {
             font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .saved-token-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .saved-token-chip {
+            min-height: 38px;
+            padding: 0 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.05);
             color: var(--text-secondary);
-            margin-bottom: 15px;
-        }
-        
-        .token-chip {
-            display: inline-block;
-            background: var(--bg-input);
-            border: 1px solid var(--border-color);
-            padding: 8px 15px;
-            border-radius: 20px;
-            margin: 0 8px 8px 0;
-            font-family: monospace;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 0.88rem;
+            font-weight: 700;
+            transition: all .22s ease;
             cursor: pointer;
-            transition: all var(--transition-base);
         }
-        
-        .token-chip:hover {
-            border-color: var(--accent-primary);
-            background: rgba(59, 130, 246, 0.1);
+
+        body[data-theme="light"] .saved-token-chip {
+            background: #e9edf2;
+            border-color: rgba(198,205,216,0.86);
         }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
+
+        .saved-token-chip:hover {
+            transform: translateY(-2px);
+            color: var(--text-primary);
+        }
+
+        .result-card,
+        .timeline-card,
+        .unavailable-card {
+            display: none;
+        }
+
+        .result-topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .result-token {
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .result-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .meta-box {
+            padding: 16px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        body[data-theme="light"] .meta-box {
+            background: #e9edf2;
+            border-color: rgba(198,205,216,0.86);
+        }
+
+        .meta-box small {
+            display: block;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            font-size: 0.82rem;
             text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        
-        .status-submitted { background: rgba(100, 116, 139, 0.2); color: #94a3b8; border: 1px solid #94a3b8; }
-        .status-assigned { background: rgba(59, 130, 246, 0.2); color: #3b82f6; border: 1px solid #3b82f6; }
-        .status-progress { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid #f59e0b; }
-        .status-resolved { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
-        .status-closed { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid #ef4444; }
-        
-        .priority-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
+
+        .meta-box strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--text-primary);
+            line-height: 1.45;
         }
-        
-        .priority-high { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
-        .priority-medium { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
-        .priority-low { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-        
-        .timeline {
+
+        .result-description {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        body[data-theme="light"] .result-description {
+            background: #eef1f5;
+            border-color: rgba(198,205,216,0.86);
+        }
+
+        .timeline-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .timeline-item-track {
             position: relative;
-            padding: 20px 0;
+            padding: 16px 18px 16px 24px;
+            border-radius: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
         }
-        
-        .timeline::before {
-            content: '';
+
+        body[data-theme="light"] .timeline-item-track {
+            background: #eef1f5;
+            border-color: rgba(198,205,216,0.86);
+        }
+
+        .timeline-item-track::before {
+            content: "";
             position: absolute;
-            left: 15px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: var(--border-color);
-        }
-        
-        .timeline-item {
-            position: relative;
-            padding-left: 45px;
-            margin-bottom: 25px;
-        }
-        
-        .timeline-dot {
-            position: absolute;
-            left: 8px;
-            width: 16px;
-            height: 16px;
+            left: 12px;
+            top: 22px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
             background: var(--accent-primary);
-            border: 3px solid var(--bg-card);
+            box-shadow: 0 0 0 6px rgba(124,156,255,0.12);
         }
-        
-        .timeline-date {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 5px;
+
+        body[data-theme="light"] .timeline-item-track::before {
+            box-shadow: 0 0 0 6px rgba(53,99,233,0.08);
         }
-        
-        .timeline-status {
-            font-weight: 600;
-            color: var(--text-primary);
+
+        .timeline-item-track h4 {
+            font-size: 0.98rem;
+            margin-bottom: 6px;
         }
-        
-        .timeline-remark {
+
+        .timeline-item-track p {
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 5px;
+            font-size: 0.92rem;
+            line-height: 1.55;
         }
-        
-        .info-grid {
+
+        .timeline-time {
+            display: inline-block;
+            margin-top: 8px;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        .status-guide-list {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-            padding: 20px;
-            background: var(--bg-surface);
-            border-radius: var(--radius);
+            gap: 12px;
         }
-        
-        .info-item label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
+
+        .status-guide-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
         }
-        
-        .info-item .value {
-            font-size: 1rem;
-            color: var(--text-primary);
-            font-weight: 500;
+
+        body[data-theme="light"] .status-guide-item {
+            background: #e9edf2;
+            border-color: rgba(198,205,216,0.86);
         }
-        
-        .evidence-grid {
+
+        .status-guide-item i {
+            margin-top: 3px;
+            color: var(--accent-primary);
+        }
+
+        .status-guide-item p {
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+            line-height: 1.55;
+        }
+
+        .status-hero-badge {
+            min-height: 34px;
+            padding: 0 12px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.16);
+            color: #ffd993;
+            border: 1px solid rgba(245, 158, 11, 0.22);
+        }
+
+        .status-verified {
+            background: rgba(16, 185, 129, 0.16);
+            color: #d0fff0;
+            border: 1px solid rgba(16, 185, 129, 0.22);
+        }
+
+        .status-progress {
+            background: rgba(139, 92, 246, 0.16);
+            color: #f0e0ff;
+            border: 1px solid rgba(139, 92, 246, 0.22);
+        }
+
+        .status-resolved {
+            background: rgba(59, 130, 246, 0.16);
+            color: #d8e6ff;
+            border: 1px solid rgba(59, 130, 246, 0.22);
+        }
+
+        body[data-theme="light"] .status-pending {
+            background: #f8ecd6;
+            color: #a56d0c;
+            border-color: #ecdab3;
+        }
+
+        body[data-theme="light"] .status-verified {
+            background: #def2ea;
+            color: #0f8160;
+            border-color: #c2e3d7;
+        }
+
+        body[data-theme="light"] .status-progress {
+            background: #ece4fb;
+            color: #6543bc;
+            border-color: #d6c9f0;
+        }
+
+        body[data-theme="light"] .status-resolved {
+            background: #dfe8fb;
+            color: #2455be;
+            border-color: #c5d2f2;
+        }
+
+        .unavailable-card {
+            text-align: center;
+        }
+
+        .unavailable-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            border-radius: 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            place-items: center;
+            background: rgba(255,255,255,0.06);
+            color: var(--accent-danger);
+            font-size: 1.4rem;
         }
-        
-        .evidence-item {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
+
+        body[data-theme="light"] .unavailable-icon {
+            background: #e9edf2;
         }
-        
-        .evidence-item:hover {
-            border-color: var(--accent-primary);
+
+        .unavailable-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
         }
-        
-        .evidence-item i {
-            font-size: 2rem;
-            color: var(--text-muted);
-            margin-bottom: 10px;
+
+        @media (max-width: 1080px) {
+            .track-hero,
+            .track-layout {
+                grid-template-columns: 1fr;
+            }
         }
-        
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-        }
-        
-        .loading i {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            animation: spin 2s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .not-found {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .not-found i {
-            font-size: 4rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
+
+        @media (max-width: 720px) {
+            .track-shell {
+                width: min(100% - 24px, 100%);
+            }
+
+            .track-hero,
+            .track-form-card,
+            .track-info-card,
+            .result-card,
+            .timeline-card,
+            .status-guide-card,
+            .unavailable-card {
+                padding: 20px;
+            }
+
+            .track-form-row,
+            .result-meta-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .track-form-row .btn-primary,
+            .track-form-row .secondary-btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
-<body>
-    <!-- Progress Bar -->
-    <div class="progress-container">
+<body data-theme="dark">
+    <div class="progress-container" aria-hidden="true">
         <div class="progress-bar" id="progressBar"></div>
     </div>
 
-    <!-- Header -->
     <header class="site-header">
         <div class="container">
             <div class="header-content">
                 <div class="logo-area">
-                    <a href="index.html" style="text-decoration: none; color: inherit;">
-                        <h1 class="logo">📋 <span>CAMPUS</span> GOVERNANCE</h1>
-                        <small class="sub-logo">CGS</small>
-                        <span class="institution">DIU · Track Report</span>
+                    <a href="index.html" class="logo-link">
+                        <div class="logo-icon">
+                            <i class="fas fa-location-crosshairs"></i>
+                        </div>
+                        <div class="logo-text">
+                            <h1>CAMPUS <span>GOVERNANCE</span></h1>
+                            <span class="institution">DIU · Track Report</span>
+                        </div>
                     </a>
                 </div>
-                
-                <div class="header-actions">
-                    <div class="lang-toggle">
-                        <button class="lang-btn active" data-lang="en">EN</button>
-                        <button class="lang-btn" data-lang="bn">বাংলা</button>
+
+                <div class="header-controls">
+                    <div class="theme-toggle">
+                        <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">
+                            <i class="fas fa-moon" id="themeIcon"></i>
+                        </button>
+                    </div>
+
+                    <div class="lang-toggle" aria-label="Language switcher">
+                        <button class="lang-btn active" type="button" data-lang="en" onclick="setLanguage('en')">EN</button>
+                        <button class="lang-btn" type="button" data-lang="bn" onclick="setLanguage('bn')">বাংলা</button>
+                    </div>
+
+                    <div class="auth-buttons">
+                        <a href="report.html" class="btn-outline">
+                            <i class="fas fa-pen-to-square"></i>
+                            <span class="lang-en">Report Issue</span>
+                            <span class="lang-bn" style="display:none;">রিপোর্ট করুন</span>
+                        </a>
+                        <a href="index.html" class="btn-primary">
+                            <i class="fas fa-house"></i>
+                            <span class="lang-en">Home</span>
+                            <span class="lang-bn" style="display:none;">হোম</span>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Emergency Banner -->
-    <div class="emergency-banner">
-        <div class="container">
-            <div class="emergency-content">
-                <span class="emergency-icon">🚨</span>
-                <span class="emergency-text">For immediate threats, contact Campus Security:</span>
-                <a href="tel:+8801712345678" class="emergency-phone">📞 01712-345678</a>
-                <span class="emergency-divider">|</span>
-                <a href="tel:+8801812345678" class="emergency-phone">📞 01812-345678</a>
-                <button class="close-banner" onclick="this.parentElement.parentElement.style.display='none'">✕</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Track Page -->
-    <main class="track-page">
-        <div class="track-header">
-            <h1>Track Your Report</h1>
-            <p>Enter your tracking token to view current status</p>
-        </div>
-
-        <!-- Token Input Card -->
-        <div class="track-card">
-            <div class="token-input-group">
-                <input type="text" id="tokenInput" placeholder="Enter token (e.g., CGS-A7F3-4B9C)" autocomplete="off">
-                <button class="primary-btn" onclick="trackReport()">🔍 Track</button>
-            </div>
-
-            <!-- Recent Tokens -->
-            <div class="recent-tokens">
-                <h3>📌 Recent Tokens</h3>
-                <div id="recentTokensList">
-                    <span class="token-chip">CGS-ABC123</span>
-                    <span class="token-chip">CGS-DEF456</span>
-                    <span class="token-chip">CGS-GHI789</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Loading State -->
-        <div id="loadingState" class="loading" style="display: none;">
-            <i class="fas fa-spinner"></i>
-            <p>Fetching report details...</p>
-        </div>
-
-        <!-- Not Found State -->
-        <div id="notFoundState" class="track-card not-found" style="display: none;">
-            <i class="fas fa-search"></i>
-            <h3>Report Not Found</h3>
-            <p style="color: var(--text-secondary); margin: 10px 0;">No report found with token: <strong id="notFoundToken"></strong></p>
-            <p style="color: var(--text-muted);">Please check the token and try again.</p>
-            <button class="secondary-btn" style="margin-top: 20px;" onclick="resetTrack()">Try Again</button>
-        </div>
-
-        <!-- Report Details -->
-        <div id="reportDetails" style="display: none;">
-            <!-- Status Card -->
-            <div class="track-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>Report Status</h2>
-                    <span class="status-badge status-progress" id="statusBadge">In Progress</span>
+    <main class="track-shell">
+        <section class="track-hero">
+            <div>
+                <div class="hero-badge">
+                    <i class="fas fa-key"></i>
+                    <span class="lang-en">University report tracking</span>
+                    <span class="lang-bn" style="display:none;">বিশ্ববিদ্যালয় রিপোর্ট ট্র্যাকিং</span>
                 </div>
 
-                <!-- Info Grid -->
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Tracking Token</label>
-                        <span class="value" id="detailToken">CGS-A7F3-4B9C</span>
-                    </div>
-                    <div class="info-item">
-                        <label>Submitted</label>
-                        <span class="value" id="detailDate">Mar 15, 2026</span>
-                    </div>
-                    <div class="info-item">
-                        <label>Category</label>
-                        <span class="value" id="detailCategory">Academic</span>
-                    </div>
-                    <div class="info-item">
-                        <label>Priority</label>
-                        <span class="value">
-                            <span class="priority-badge priority-medium" id="detailPriority">Medium</span>
-                        </span>
-                    </div>
-                    <div class="info-item">
-                        <label>Department</label>
-                        <span class="value" id="detailDepartment">Academic Affairs</span>
-                    </div>
-                    <div class="info-item">
-                        <label>Assigned To</label>
-                        <span class="value" id="detailAssigned">Dr. Rahman</span>
-                    </div>
+                <h1 class="hero-title">
+                    <span class="lang-en">Find your report quickly with the tracking token.</span>
+                    <span class="lang-bn" style="display:none;">ট্র্যাকিং টোকেন দিয়ে দ্রুত আপনার রিপোর্ট খুঁজুন।</span>
+                </h1>
+
+                <p class="hero-copy">
+                    <span class="lang-en">
+                        Enter the token you received after submitting a report. This page checks the backend and only shows information when a valid matching report exists.
+                    </span>
+                    <span class="lang-bn" style="display:none;">
+                        রিপোর্ট জমা দেওয়ার পরে পাওয়া টোকেন লিখুন। এই পেজ ব্যাকএন্ডে খোঁজ করে এবং সঠিক মিল পাওয়া গেলে তবেই তথ্য দেখায়।
+                    </span>
+                </p>
+            </div>
+
+            <div class="hero-mini-list">
+                <div class="hero-mini-item">
+                    <h4 class="lang-en">No login required</h4>
+                    <h4 class="lang-bn" style="display:none;">লগইন প্রয়োজন নেই</h4>
+                    <p class="lang-en">Users can check report progress directly with their token.</p>
+                    <p class="lang-bn" style="display:none;">শুধু টোকেন দিয়ে ব্যবহারকারীরা রিপোর্টের অগ্রগতি দেখতে পারবেন।</p>
                 </div>
 
-                <!-- Title & Description -->
-                <div style="margin: 20px 0;">
-                    <h3 id="detailTitle">Broken AC in Room 502</h3>
-                    <p style="color: var(--text-secondary); margin-top: 10px;" id="detailDescription">
-                        AC has been not working for 3 days. Room temperature is very high, making classes difficult.
+                <div class="hero-mini-item">
+                    <h4 class="lang-en">Backend-verified results</h4>
+                    <h4 class="lang-bn" style="display:none;">ব্যাকএন্ড যাচাইকৃত ফলাফল</h4>
+                    <p class="lang-en">Invalid or missing tokens will show report unavailable instead of fake data.</p>
+                    <p class="lang-bn" style="display:none;">ভুল বা অনুপস্থিত টোকেনে ভুয়া তথ্য নয়, অনুপলব্ধ ফলাফল দেখানো হবে।</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="track-layout">
+            <div style="display:grid; gap:22px;">
+                <section class="track-form-card">
+                    <div class="track-form-highlight">
+                        <h2 class="lang-en">Track Report Status</h2>
+                        <h2 class="lang-bn" style="display:none;">রিপোর্ট স্ট্যাটাস ট্র্যাক করুন</h2>
+                        <p class="lang-en">Enter your token below to check the latest report status and progress.</p>
+                        <p class="lang-bn" style="display:none;">সর্বশেষ রিপোর্ট স্ট্যাটাস ও অগ্রগতি দেখতে নিচে আপনার টোকেন লিখুন।</p>
+                    </div>
+
+                    <form id="trackForm">
+                        <div class="track-form-row">
+                            <div class="token-input-shell">
+                                <i class="fas fa-key"></i>
+                                <input
+                                    type="text"
+                                    id="trackToken"
+                                    name="token"
+                                    placeholder="Enter your tracking token"
+                                    autocomplete="off"
+                                />
+                            </div>
+
+                            <button type="submit" class="btn-primary" id="trackBtn">
+                                <i class="fas fa-search"></i>
+                                <span class="lang-en">Track</span>
+                                <span class="lang-bn" style="display:none;">ট্র্যাক</span>
+                            </button>
+
+                            <button type="button" class="secondary-btn" id="clearBtn">
+                                <i class="fas fa-rotate-left"></i>
+                                <span class="lang-en">Clear</span>
+                                <span class="lang-bn" style="display:none;">মুছুন</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="track-note">
+                        <span class="lang-en">Example format: CGS-ABC123</span>
+                        <span class="lang-bn" style="display:none;">উদাহরণ ফরম্যাট: CGS-ABC123</span>
+                    </div>
+
+                    <div class="saved-token-area" id="savedTokensWrap" style="display:none;">
+                        <h3 class="saved-token-title lang-en">Recent tokens</h3>
+                        <h3 class="saved-token-title lang-bn" style="display:none;">সাম্প্রতিক টোকেন</h3>
+                        <div class="saved-token-list" id="savedTokensList"></div>
+                    </div>
+                </section>
+
+                <section class="unavailable-card" id="unavailableCard">
+                    <div class="unavailable-icon">
+                        <i class="fas fa-circle-exclamation"></i>
+                    </div>
+                    <h3 class="lang-en">Report unavailable</h3>
+                    <h3 class="lang-bn" style="display:none;">রিপোর্ট পাওয়া যায়নি</h3>
+                    <p id="unavailableTextEn" class="lang-en">
+                        No report was found for the token you entered. Please check the token and try again.
                     </p>
-                </div>
+                    <p id="unavailableTextBn" class="lang-bn" style="display:none;">
+                        আপনার দেওয়া টোকেনের জন্য কোনো রিপোর্ট পাওয়া যায়নি। টোকেনটি আবার যাচাই করে চেষ্টা করুন।
+                    </p>
+                </section>
 
-                <!-- Location -->
-                <div style="background: var(--bg-surface); padding: 15px; border-radius: var(--radius); margin: 20px 0;">
-                    <span style="color: var(--text-muted);">📍 Location:</span>
-                    <span style="color: var(--text-primary); margin-left: 10px;" id="detailLocation">Academic Building A, Room 502</span>
-                </div>
+                <section class="result-card" id="resultCard">
+                    <div class="result-topbar">
+                        <div>
+                            <h3 class="lang-en">Tracking result</h3>
+                            <h3 class="lang-bn" style="display:none;">ট্র্যাকিং ফলাফল</h3>
+                            <div class="result-token" id="resultToken">CGS-XXXXXX</div>
+                        </div>
 
-                <!-- Timeline -->
-                <h3 style="margin: 30px 0 20px;">📅 Status Timeline</h3>
-                <div class="timeline" id="timeline">
-                    <!-- Timeline items will be inserted here -->
-                </div>
-
-                <!-- Evidence -->
-                <h3 style="margin: 30px 0 20px;">📎 Attached Evidence</h3>
-                <div class="evidence-grid" id="evidenceList">
-                    <div class="evidence-item">
-                        <i class="fas fa-image"></i>
-                        <p>photo_1.jpg</p>
+                        <div id="resultStatusBadge" class="status-hero-badge status-pending">Pending</div>
                     </div>
-                    <div class="evidence-item">
-                        <i class="fas fa-file-pdf"></i>
-                        <p>report.pdf</p>
-                    </div>
-                </div>
 
-                <!-- Actions -->
-                <div style="display: flex; gap: 15px; margin-top: 30px;">
-                    <button class="secondary-btn" onclick="window.location.href='report.html'">
-                        <i class="fas fa-plus"></i> Submit New Report
-                    </button>
-                    <button class="secondary-btn" onclick="resetTrack()">
-                        <i class="fas fa-search"></i> Track Another
-                    </button>
-                </div>
+                    <div class="result-meta-grid">
+                        <div class="meta-box">
+                            <small class="lang-en">Title</small>
+                            <small class="lang-bn" style="display:none;">শিরোনাম</small>
+                            <strong id="resultTitle">—</strong>
+                        </div>
+
+                        <div class="meta-box">
+                            <small class="lang-en">Category</small>
+                            <small class="lang-bn" style="display:none;">ক্যাটেগরি</small>
+                            <strong id="resultCategory">—</strong>
+                        </div>
+
+                        <div class="meta-box">
+                            <small class="lang-en">Location</small>
+                            <small class="lang-bn" style="display:none;">লোকেশন</small>
+                            <strong id="resultLocation">—</strong>
+                        </div>
+
+                        <div class="meta-box">
+                            <small class="lang-en">Last updated</small>
+                            <small class="lang-bn" style="display:none;">সর্বশেষ আপডেট</small>
+                            <strong id="resultUpdatedAt">—</strong>
+                        </div>
+                    </div>
+
+                    <div class="result-description" id="resultDescription">—</div>
+                </section>
+
+                <section class="timeline-card" id="timelineCard">
+                    <h3 class="lang-en">Status timeline</h3>
+                    <h3 class="lang-bn" style="display:none;">স্ট্যাটাস টাইমলাইন</h3>
+                    <div class="timeline-list" id="timelineList"></div>
+                </section>
             </div>
-        </div>
+
+            <aside style="display:grid; gap:22px;">
+                <section class="status-guide-card">
+                    <h3 class="lang-en">Status guide</h3>
+                    <h3 class="lang-bn" style="display:none;">স্ট্যাটাস গাইড</h3>
+
+                    <div class="status-guide-list">
+                        <div class="status-guide-item">
+                            <i class="fas fa-hourglass-half"></i>
+                            <p>
+                                <strong class="lang-en">Pending:</strong>
+                                <strong class="lang-bn" style="display:none;">Pending:</strong>
+                                <span class="lang-en"> waiting for review.</span>
+                                <span class="lang-bn" style="display:none;"> রিভিউয়ের অপেক্ষায় আছে।</span>
+                            </p>
+                        </div>
+
+                        <div class="status-guide-item">
+                            <i class="fas fa-badge-check"></i>
+                            <p>
+                                <strong class="lang-en">Verified:</strong>
+                                <strong class="lang-bn" style="display:none;">Verified:</strong>
+                                <span class="lang-en"> checked and confirmed.</span>
+                                <span class="lang-bn" style="display:none;"> যাচাই করা হয়েছে।</span>
+                            </p>
+                        </div>
+
+                        <div class="status-guide-item">
+                            <i class="fas fa-gears"></i>
+                            <p>
+                                <strong class="lang-en">In Progress:</strong>
+                                <strong class="lang-bn" style="display:none;">In Progress:</strong>
+                                <span class="lang-en"> action is being taken.</span>
+                                <span class="lang-bn" style="display:none;"> কাজ চলছে।</span>
+                            </p>
+                        </div>
+
+                        <div class="status-guide-item">
+                            <i class="fas fa-circle-check"></i>
+                            <p>
+                                <strong class="lang-en">Resolved:</strong>
+                                <strong class="lang-bn" style="display:none;">Resolved:</strong>
+                                <span class="lang-en"> the report has been completed or closed.</span>
+                                <span class="lang-bn" style="display:none;"> রিপোর্ট সমাধান বা বন্ধ হয়েছে।</span>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="track-info-card">
+                    <h3 class="lang-en">Need to submit a new report?</h3>
+                    <h3 class="lang-bn" style="display:none;">নতুন রিপোর্ট জমা দিতে চান?</h3>
+                    <p class="lang-en" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                        Use the report page to submit a new issue and receive a new tracking token.
+                    </p>
+                    <p class="lang-bn" style="display:none; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+                        নতুন সমস্যা জমা দিতে রিপোর্ট পেজ ব্যবহার করুন এবং নতুন ট্র্যাকিং টোকেন নিন।
+                    </p>
+
+                    <a href="report.html" class="btn-primary">
+                        <i class="fas fa-pen-to-square"></i>
+                        <span class="lang-en">Go to Report Page</span>
+                        <span class="lang-bn" style="display:none;">রিপোর্ট পেজে যান</span>
+                    </a>
+                </section>
+            </aside>
+        </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <h4>About</h4>
-                    <p>DIU Campus Governance System ensures transparent, anonymous, and accountable issue resolution.</p>
-                </div>
-                <div class="footer-col">
-                    <h4>Quick Links</h4>
-                    <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="report.html">Report Issue</a></li>
-                        <li><a href="dashboard.html">Dashboard</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Emergency</h4>
-                    <p>Campus Security: 01712-345678</p>
-                    <p>Medical: 01812-345678</p>
-                    <p>Women's Support: 01912-345678</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2026 DIU Campus Governance System</p>
-                <p class="footer-tagline">Anonymous · Secure · Accountable</p>
-            </div>
-        </div>
-    </footer>
+    <div class="toast-container" id="toastContainer"></div>
 
-    <script src="js/main.js"></script>
     <script>
-        // Load recent tokens from localStorage
-        function loadRecentTokens() {
-            const tokens = JSON.parse(localStorage.getItem('cgs_tokens') || '[]');
-            const list = document.getElementById('recentTokensList');
-            
-            if (tokens.length === 0) {
-                list.innerHTML = '<p style="color: var(--text-muted);">No recent tokens</p>';
-                return;
-            }
-            
-            list.innerHTML = tokens.map(token => 
-                `<span class="token-chip" onclick="document.getElementById('tokenInput').value='${token}'">${token}</span>`
-            ).join('');
+        const API_BASE = `${window.location.origin}/api`;
+
+        const progressBar = document.getElementById('progressBar');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+
+        const trackForm = document.getElementById('trackForm');
+        const tokenInput = document.getElementById('trackToken');
+        const trackBtn = document.getElementById('trackBtn');
+        const clearBtn = document.getElementById('clearBtn');
+
+        const savedTokensWrap = document.getElementById('savedTokensWrap');
+        const savedTokensList = document.getElementById('savedTokensList');
+
+        const unavailableCard = document.getElementById('unavailableCard');
+        const resultCard = document.getElementById('resultCard');
+        const timelineCard = document.getElementById('timelineCard');
+
+        const resultToken = document.getElementById('resultToken');
+        const resultStatusBadge = document.getElementById('resultStatusBadge');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultCategory = document.getElementById('resultCategory');
+        const resultLocation = document.getElementById('resultLocation');
+        const resultUpdatedAt = document.getElementById('resultUpdatedAt');
+        const resultDescription = document.getElementById('resultDescription');
+        const timelineList = document.getElementById('timelineList');
+
+        let currentLanguage = localStorage.getItem('cgs_language') || 'en';
+
+        function setThemeIcon(theme) {
+            themeIcon.className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';
         }
 
-        // Mock data for demo
-        const mockReports = {
-            'CGS-ABC123': {
-                token: 'CGS-ABC123',
-                status: 'in_progress',
-                priority: 'high',
-                category: 'Facility',
-                title: 'Broken AC in Room 502',
-                description: 'AC has been not working for 3 days. Room temperature is very high, making classes difficult.',
-                location: 'Academic Building A, Room 502',
-                department: 'Facilities Management',
-                assignedTo: 'Engr. Karim',
-                submitted: '2026-03-15',
-                timeline: [
-                    { date: '2026-03-15 10:30', status: 'submitted', remark: 'Report submitted' },
-                    { date: '2026-03-15 14:20', status: 'assigned', remark: 'Assigned to Facilities Dept' },
-                    { date: '2026-03-16 09:15', status: 'in_progress', remark: 'Technician assigned, parts ordered' }
-                ]
-            },
-            'CGS-DEF456': {
-                token: 'CGS-DEF456',
-                status: 'resolved',
-                priority: 'medium',
-                category: 'IT',
-                title: 'Slow WiFi in Library',
-                description: 'Internet speed drops significantly during peak hours (2-6 PM)',
-                location: 'Central Library, 2nd Floor',
-                department: 'IT Services',
-                assignedTo: 'Network Team',
-                submitted: '2026-03-10',
-                timeline: [
-                    { date: '2026-03-10 11:20', status: 'submitted', remark: 'Report submitted' },
-                    { date: '2026-03-10 15:30', status: 'assigned', remark: 'Assigned to IT Services' },
-                    { date: '2026-03-11 10:00', status: 'in_progress', remark: 'Network diagnostics in progress' },
-                    { date: '2026-03-12 16:45', status: 'resolved', remark: 'Router replaced, speed restored' }
-                ]
-            }
-        };
+        function loadTheme() {
+            const theme = localStorage.getItem('cgs_theme') || 'dark';
+            document.body.setAttribute('data-theme', theme);
+            setThemeIcon(theme);
+        }
 
-        function trackReport() {
-            const token = document.getElementById('tokenInput').value.trim();
-            if (!token) {
-                alert('Please enter a tracking token');
-                return;
-            }
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme') || 'dark';
+            const next = current === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', next);
+            localStorage.setItem('cgs_theme', next);
+            setThemeIcon(next);
+        }
 
-            // Show loading
-            document.getElementById('loadingState').style.display = 'block';
-            document.getElementById('notFoundState').style.display = 'none';
-            document.getElementById('reportDetails').style.display = 'none';
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('cgs_language', lang);
 
-            // Simulate API call
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            document.querySelectorAll('.lang-en').forEach(el => {
+                el.style.display = lang === 'en' ? '' : 'none';
+            });
+
+            document.querySelectorAll('.lang-bn').forEach(el => {
+                el.style.display = lang === 'bn' ? '' : 'none';
+            });
+
+            tokenInput.placeholder = lang === 'bn'
+                ? 'আপনার ট্র্যাকিং টোকেন লিখুন'
+                : 'Enter your tracking token';
+        }
+
+        function updateProgressBar() {
+            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const width = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+            progressBar.style.width = `${width}%`;
+        }
+
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+
+            requestAnimationFrame(() => toast.classList.add('show'));
+
             setTimeout(() => {
-                document.getElementById('loadingState').style.display = 'none';
-                
-                const report = mockReports[token];
-                if (report) {
-                    displayReport(report);
-                } else {
-                    document.getElementById('notFoundToken').textContent = token;
-                    document.getElementById('notFoundState').style.display = 'block';
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function prettifyStatus(status = '') {
+            const s = String(status).replace(/_/g, ' ').trim();
+            return s ? s.replace(/\b\w/g, ch => ch.toUpperCase()) : 'Pending';
+        }
+
+        function prettifyText(value = '') {
+            return String(value)
+                .trim()
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, ch => ch.toUpperCase());
+        }
+
+        function getStatusBadgeClass(status = '') {
+            const normalized = String(status).toLowerCase();
+            if (normalized.includes('resolved')) return 'status-resolved';
+            if (normalized.includes('verified')) return 'status-verified';
+            if (normalized.includes('progress') || normalized.includes('assigned')) return 'status-progress';
+            return 'status-pending';
+        }
+
+        function formatDateTime(value = '') {
+            if (!value) return '—';
+            const parsed = new Date(value);
+            if (Number.isNaN(parsed.getTime())) return value;
+            return parsed.toLocaleString();
+        }
+
+        function saveToken(token) {
+            if (!token) return;
+            const tokens = JSON.parse(localStorage.getItem('cgs_tokens') || '[]');
+            const deduped = [token, ...tokens.filter(t => t !== token)].slice(0, 8);
+            localStorage.setItem('cgs_tokens', JSON.stringify(deduped));
+            renderSavedTokens();
+        }
+
+        function renderSavedTokens() {
+            const tokens = JSON.parse(localStorage.getItem('cgs_tokens') || '[]');
+            if (!tokens.length) {
+                savedTokensWrap.style.display = 'none';
+                savedTokensList.innerHTML = '';
+                return;
+            }
+
+            savedTokensWrap.style.display = 'block';
+            savedTokensList.innerHTML = '';
+
+            tokens.forEach(token => {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'saved-token-chip';
+                button.textContent = token;
+                button.addEventListener('click', () => {
+                    tokenInput.value = token;
+                    trackReport();
+                });
+                savedTokensList.appendChild(button);
+            });
+        }
+
+        function parseQueryToken() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('token') || '';
+        }
+
+        function clearDisplays() {
+            unavailableCard.style.display = 'none';
+            resultCard.style.display = 'none';
+            timelineCard.style.display = 'none';
+            timelineList.innerHTML = '';
+            resultToken.textContent = 'CGS-XXXXXX';
+            resultTitle.textContent = '—';
+            resultCategory.textContent = '—';
+            resultLocation.textContent = '—';
+            resultUpdatedAt.textContent = '—';
+            resultDescription.textContent = '—';
+            resultStatusBadge.className = 'status-hero-badge status-pending';
+            resultStatusBadge.textContent = 'Pending';
+        }
+
+        function showUnavailable() {
+            resultCard.style.display = 'none';
+            timelineCard.style.display = 'none';
+            unavailableCard.style.display = 'block';
+        }
+
+        function renderTrackResult(data) {
+            const statusText = prettifyStatus(data.status || 'pending');
+
+            resultToken.textContent = data.token || '—';
+            resultTitle.textContent = data.title || '—';
+            resultCategory.textContent = prettifyText(data.category || '—');
+            resultLocation.textContent = data.location || 'Not specified';
+            resultUpdatedAt.textContent = formatDateTime(data.updated_at || data.created_at || '');
+            resultDescription.textContent = data.description || '—';
+
+            resultStatusBadge.className = `status-hero-badge ${getStatusBadgeClass(data.status)}`;
+            resultStatusBadge.textContent = statusText;
+
+            const rawTimeline = Array.isArray(data.timeline) ? data.timeline : [];
+
+            if (rawTimeline.length) {
+                timelineList.innerHTML = rawTimeline.map(step => `
+                    <div class="timeline-item-track">
+                        <h4>${escapeHtml(step.title || prettifyStatus(step.status || 'update'))}</h4>
+                        <p>${escapeHtml(step.note || step.description || 'Status updated.')}</p>
+                        <span class="timeline-time">${escapeHtml(formatDateTime(step.created_at || step.createdAt || ''))}</span>
+                    </div>
+                `).join('');
+            } else {
+                timelineList.innerHTML = `
+                    <div class="timeline-item-track">
+                        <h4>${currentLanguage === 'bn' ? 'বর্তমান অবস্থা' : 'Current Status'}</h4>
+                        <p>${currentLanguage === 'bn' ? 'এই রিপোর্টের জন্য বিস্তারিত টাইমলাইন এখনো পাওয়া যায়নি।' : 'A detailed timeline is not available for this report yet.'}</p>
+                    </div>
+                `;
+            }
+
+            unavailableCard.style.display = 'none';
+            resultCard.style.display = 'block';
+            timelineCard.style.display = 'block';
+        }
+
+        async function fetchTrackResult(token) {
+            const response = await fetch(`${API_BASE}/report/track?token=${encodeURIComponent(token)}`, {
+                method: 'GET'
+            });
+
+            const data = await response.json().catch(() => null);
+
+            if (!response.ok || !data?.success) {
+                return null;
+            }
+
+            return data.data || null;
+        }
+
+        async function trackReport() {
+            const token = tokenInput.value.trim();
+
+            if (!token) {
+                showToast(currentLanguage === 'bn' ? 'দয়া করে একটি টোকেন লিখুন।' : 'Please enter a token.', 'error');
+                clearDisplays();
+                return;
+            }
+
+            const originalHtml = trackBtn.innerHTML;
+            trackBtn.disabled = true;
+            trackBtn.innerHTML = `<span class="loading-spinner"></span> ${currentLanguage === 'bn' ? 'ট্র্যাক হচ্ছে...' : 'Tracking...'}`;
+
+            try {
+                clearDisplays();
+
+                const result = await fetchTrackResult(token);
+
+                if (!result) {
+                    showUnavailable();
+                    showToast(
+                        currentLanguage === 'bn'
+                            ? 'এই টোকেনের জন্য কোনো রিপোর্ট পাওয়া যায়নি।'
+                            : 'No report was found for this token.',
+                        'error'
+                    );
+                    return;
                 }
-            }, 1000);
+
+                renderTrackResult({
+                    token: result.token || token,
+                    title: result.title || '',
+                    category: result.category || '',
+                    location: result.location || '',
+                    status: result.status || 'pending',
+                    description: result.description || '',
+                    updated_at: result.updated_at || '',
+                    created_at: result.created_at || '',
+                    timeline: result.timeline || []
+                });
+
+                saveToken(result.token || token);
+
+                showToast(
+                    currentLanguage === 'bn'
+                        ? 'রিপোর্ট তথ্য লোড হয়েছে।'
+                        : 'Report information loaded.',
+                    'success'
+                );
+            } catch (error) {
+                console.error('Track report error:', error);
+                clearDisplays();
+                showUnavailable();
+                showToast(
+                    currentLanguage === 'bn'
+                        ? 'সার্ভার থেকে তথ্য আনা যায়নি।'
+                        : 'Could not fetch report information from the server.',
+                    'error'
+                );
+            } finally {
+                trackBtn.disabled = false;
+                trackBtn.innerHTML = originalHtml;
+            }
         }
 
-        function displayReport(report) {
-            // Set status badge
-            const badge = document.getElementById('statusBadge');
-            badge.className = `status-badge status-${report.status}`;
-            badge.textContent = report.status.replace('_', ' ').toUpperCase();
-
-            // Set details
-            document.getElementById('detailToken').textContent = report.token;
-            document.getElementById('detailDate').textContent = new Date(report.submitted).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-            document.getElementById('detailCategory').textContent = report.category;
-            document.getElementById('detailPriority').textContent = report.priority.toUpperCase();
-            document.getElementById('detailPriority').className = `priority-badge priority-${report.priority}`;
-            document.getElementById('detailDepartment').textContent = report.department;
-            document.getElementById('detailAssigned').textContent = report.assignedTo;
-            document.getElementById('detailTitle').textContent = report.title;
-            document.getElementById('detailDescription').textContent = report.description;
-            document.getElementById('detailLocation').textContent = report.location;
-
-            // Build timeline
-            const timeline = document.getElementById('timeline');
-            timeline.innerHTML = report.timeline.map(item => `
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-date">${item.date}</div>
-                    <div class="timeline-status">${item.status.replace('_', ' ').toUpperCase()}</div>
-                    ${item.remark ? `<div class="timeline-remark">${item.remark}</div>` : ''}
-                </div>
-            `).join('');
-
-            // Show details
-            document.getElementById('reportDetails').style.display = 'block';
+        function clearTrackingPage() {
+            tokenInput.value = '';
+            clearDisplays();
         }
 
-        function resetTrack() {
-            document.getElementById('tokenInput').value = '';
-            document.getElementById('loadingState').style.display = 'none';
-            document.getElementById('notFoundState').style.display = 'none';
-            document.getElementById('reportDetails').style.display = 'none';
-        }
+        themeToggle.addEventListener('click', toggleTheme);
+        trackForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            trackReport();
+        });
+        clearBtn.addEventListener('click', clearTrackingPage);
+        window.addEventListener('scroll', updateProgressBar);
 
-        // Initialize
-        loadRecentTokens();
+        document.addEventListener('DOMContentLoaded', async () => {
+            loadTheme();
+            setLanguage(currentLanguage);
+            renderSavedTokens();
+            updateProgressBar();
+
+            const queryToken = parseQueryToken();
+            if (queryToken) {
+                tokenInput.value = queryToken;
+                await trackReport();
+            }
+        });
     </script>
 </body>
 </html>

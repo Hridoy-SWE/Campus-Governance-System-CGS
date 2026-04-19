@@ -248,11 +248,11 @@ const Auth = (function() {
         showToast('Logged out successfully', 'success');
         
         // Redirect to home if on protected page
-        const protectedPages = ['dashboard.html', 'department.html', 'admin/index.php'];
+        const protectedPages = ['dashboard.html', 'department.html', 'admin/dashboard.php'];
         const currentPage = window.location.pathname.split('/').pop();
         if (protectedPages.includes(currentPage)) {
             setTimeout(() => {
-                window.location.href = 'index.html';
+                window.location.href = 'dashboard.html';
             }, 1500);
         }
     };
@@ -298,7 +298,7 @@ const Auth = (function() {
         menuLinks.forEach(link => {
             const href = link.getAttribute('href');
             
-            if (href === 'admin/index.php') {
+            if (href === 'admin/dashboard.php') {
                 // Only show admin panel to admins
                 if (userData.role === 'admin') {
                     link.style.display = 'flex';

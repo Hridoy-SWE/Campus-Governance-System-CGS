@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Analytics · Campus Governance</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        .analytics-shell{width:min(1200px,calc(100% - 32px));margin:36px auto 60px;display:grid;gap:22px}
+        .analytics-hero,.analytics-card{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:28px;box-shadow:var(--card-shadow)}
+        .analytics-hero{padding:28px;display:flex;justify-content:space-between;gap:20px;align-items:flex-start}
+        .analytics-hero h1{font-size:clamp(2rem,4vw,3rem);margin-bottom:10px}
+        .analytics-hero p{max-width:70ch;color:var(--text-secondary);line-height:1.7}
+        .analytics-actions{display:flex;gap:12px;flex-wrap:wrap}
+        .analytics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+        .stat-card-public{padding:22px}
+        .stat-card-public .icon{width:58px;height:58px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(128,123,255,.95),rgba(101,216,255,.95));margin-bottom:16px}
+        .stat-card-public .num{font-size:2.4rem;font-weight:800}
+        .stat-card-public .label{color:var(--text-secondary);font-size:1rem}
+        .viz-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+        .analytics-card{padding:24px}
+        .analytics-card h3{font-size:1.3rem;margin-bottom:8px}
+        .analytics-sub{color:var(--text-secondary);margin-bottom:18px}
+        .bars{display:grid;gap:14px}
+        .bar-row{display:grid;grid-template-columns:160px 1fr 54px;gap:12px;align-items:center}
+        .bar-track{height:14px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+        body[data-theme='light'] .bar-track{background:#e7ebf3}
+        .bar-fill{height:100%;border-radius:999px;background:linear-gradient(135deg,#7c9cff,#62d3ff)}
+        .donut{width:220px;height:220px;border-radius:50%;margin:0 auto 18px;position:relative}
+        .donut::after{content:'';position:absolute;inset:28px;border-radius:50%;background:var(--panel-bg);border:1px solid var(--panel-border)}
+        .donut-center{position:relative;z-index:2;text-align:center;margin-top:-142px;margin-bottom:72px}
+        .legend{display:grid;gap:10px}
+        .legend-item{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+        body[data-theme='light'] .legend-item{background:#eef2f7;border-color:#d6deea}
+        .legend-left{display:flex;gap:10px;align-items:center}
+        .swatch{width:12px;height:12px;border-radius:50%}
+        .timeline-bars{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(58px,1fr);gap:12px;align-items:end;height:260px}
+        .timeline-col{display:grid;gap:10px;align-content:end;text-align:center}
+        .timeline-col .bar{border-radius:16px 16px 10px 10px;background:linear-gradient(180deg,#7c9cff,#4db8ff);min-height:10px}
+        .timeline-col small{color:var(--text-secondary)}
+        .report-list{display:grid;gap:12px}
+        .report-item{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:16px 18px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+        body[data-theme='light'] .report-item{background:#eef2f7;border-color:#d6deea}
+        .chip{padding:6px 10px;border-radius:999px;font-size:.78rem;font-weight:700;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.06)}
+        .empty{color:var(--text-secondary)}
+        @media (max-width:1100px){.analytics-grid,.viz-grid{grid-template-columns:1fr 1fr}.analytics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media (max-width:760px){.analytics-hero,.analytics-grid,.viz-grid{grid-template-columns:1fr;display:grid}.timeline-bars{grid-auto-columns:minmax(44px,1fr)}.bar-row{grid-template-columns:110px 1fr 40px}}
+    </style>
+</head>
+<body data-theme="dark">
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-area">
+                <a href="index.html" class="logo-link">
+                    <div class="logo-icon"><i class="fas fa-chart-pie"></i></div>
+                    <div class="logo-text">
+                        <h1>CAMPUS <span>GOVERNANCE</span></h1>
+                        <span class="institution">Public Analytics Overview</span>
+                    </div>
+                </a>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle">
+                    <button class="theme-btn" id="themeToggle" type="button"><i class="fas fa-moon" id="themeIcon"></i></button>
+                </div>
+                <div class="auth-buttons">
+                    <a href="index.html" class="btn-outline"><i class="fas fa-house"></i> Home</a>
+                    <a href="track.html" class="btn-primary"><i class="fas fa-location-crosshairs"></i> Track Report</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+<main class="analytics-shell">
+    <section class="analytics-hero">
+        <div>
+            <h1>Public report analytics</h1>
+            <p>This page shows public, non-sensitive report statistics from the live database. It does not expose private reporter identity, internal notes, or restricted moderation details.</p>
+        </div>
+        <div class="analytics-actions">
+            <a class="btn-outline" href="report.html"><i class="fas fa-pen-to-square"></i> Submit Report</a>
+            <a class="btn-outline" href="login.html"><i class="fas fa-right-to-bracket"></i> Sign In</a>
+        </div>
+    </section>
+
+    <section class="analytics-grid" id="topStats"></section>
+
+    <section class="viz-grid">
+        <section class="analytics-card">
+            <h3>Status distribution</h3>
+            <p class="analytics-sub">Live totals fetched from the database.</p>
+            <div class="donut" id="statusDonut"></div>
+            <div class="donut-center">
+                <div class="num" id="statusTotal">0</div>
+                <div class="label">Total reports</div>
+            </div>
+            <div class="legend" id="statusLegend"></div>
+        </section>
+
+        <section class="analytics-card">
+            <h3>Reports by category</h3>
+            <p class="analytics-sub">Which issue types appear most frequently.</p>
+            <div class="bars" id="categoryBars"></div>
+        </section>
+    </section>
+
+    <section class="viz-grid">
+        <section class="analytics-card">
+            <h3>Submission trend</h3>
+            <p class="analytics-sub">Last 6 months of report volume.</p>
+            <div class="timeline-bars" id="monthlyTrend"></div>
+        </section>
+
+        <section class="analytics-card">
+            <h3>Recent public reports</h3>
+            <p class="analytics-sub">Most recent titles and statuses visible to the public.</p>
+            <div class="report-list" id="publicRecentReports"></div>
+        </section>
+    </section>
+</main>
+<script>
+const API_BASE = `${window.location.origin}/api`;
+const themeIcon = document.getElementById('themeIcon');
+function loadTheme(){const theme=localStorage.getItem('cgs_theme')||'dark';document.body.setAttribute('data-theme',theme);themeIcon.className=theme==='light'?'fas fa-sun':'fas fa-moon';}
+document.getElementById('themeToggle').addEventListener('click',()=>{const next=(document.body.getAttribute('data-theme')||'dark')==='dark'?'light':'dark';localStorage.setItem('cgs_theme',next);loadTheme();});
+function esc(v){return String(v??'').replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s]));}
+function pretty(v){const s=String(v||'').replace(/_/g,' ').trim();return s?s.replace(/\b\w/g,c=>c.toUpperCase()):'Unknown';}
+function statusColor(status){const s=String(status).toLowerCase();if(s==='resolved')return '#2ad39b';if(s==='verified')return '#8bb4ff';if(s==='in_progress')return '#ffb347';return '#b18cff';}
+function renderTop(stats){const cards=[['Total Reports',stats.total_reports||0,'fa-flag'],['Verified',stats.verified_reports||0,'fa-circle-check'],['In Progress',stats.in_progress_reports||0,'fa-hourglass-half'],['Resolved',stats.resolved_reports||0,'fa-check-double']];document.getElementById('topStats').innerHTML=cards.map(([label,val,icon])=>`<section class="analytics-card stat-card-public"><div class="icon"><i class="fas ${icon}"></i></div><div class="num">${val}</div><div class="label">${label}</div></section>`).join('');}
+function renderStatus(statuses){const total=Object.values(statuses).reduce((a,b)=>a+b,0);document.getElementById('statusTotal').textContent=total;const entries=Object.entries(statuses);let start=0;const parts=entries.map(([name,val])=>{const pct=total?val*100/total:0;const color=statusColor(name);const seg=`${color} ${start}% ${start+pct}%`;start+=pct;return seg;});document.getElementById('statusDonut').style.background=`conic-gradient(${parts.join(',') || '#d0d7e5 0 100%'})`;document.getElementById('statusLegend').innerHTML=entries.map(([name,val])=>`<div class="legend-item"><div class="legend-left"><span class="swatch" style="background:${statusColor(name)}"></span><span>${pretty(name)}</span></div><strong>${val}</strong></div>`).join('');}
+function renderCategories(items){const max=Math.max(...items.map(x=>x.total),1);document.getElementById('categoryBars').innerHTML=items.length?items.map(item=>`<div class="bar-row"><span>${esc(pretty(item.category))}</span><div class="bar-track"><div class="bar-fill" style="width:${(item.total/max)*100}%"></div></div><strong>${item.total}</strong></div>`).join(''):'<div class="empty">No category data yet.</div>';}
+function renderMonths(items){const max=Math.max(...items.map(x=>x.total),1);document.getElementById('monthlyTrend').innerHTML=items.length?items.map(item=>`<div class="timeline-col"><div class="bar" style="height:${Math.max(10,(item.total/max)*210)}px"></div><strong>${item.total}</strong><small>${esc(item.label)}</small></div>`).join(''):'<div class="empty">No trend data yet.</div>';}
+function renderRecent(items){document.getElementById('publicRecentReports').innerHTML=items.length?items.map(item=>`<div class="report-item"><div><strong>${esc(item.title)}</strong><div class="label" style="margin-top:6px">${esc(pretty(item.category))} · ${esc(item.location||'Location withheld')}</div></div><span class="chip">${esc(pretty(item.status))}</span></div>`).join(''):'<div class="empty">No reports available yet.</div>';}
+async function loadAnalytics(){try{const res=await fetch(`${API_BASE}/public/analytics`);const data=await res.json();if(!res.ok||!data.success)throw new Error(data?.message||'Failed to load analytics');const payload=data.data||{};renderTop(payload.stats||{});renderStatus(payload.status_counts||{});renderCategories(payload.category_counts||[]);renderMonths(payload.monthly_counts||[]);renderRecent(payload.recent_reports||[]);}catch(e){document.getElementById('topStats').innerHTML=`<section class="analytics-card"><div class="empty">${esc(e.message||'Could not load analytics.')}</div></section>`;}}
+loadTheme();loadAnalytics();
+</script>
+</body>
+</html>

@@ -1,236 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard - Campus Governance System</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Portal - Campus Governance System</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <style>
-        .dashboard-page {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-card);
-            padding: 25px;
-            transition: all var(--transition-base);
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-primary);
-        }
-        .stat-value {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--accent-primary);
-        }
-        .chart-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-        .chart-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-card);
-            padding: 25px;
-        }
+        .student-shell{width:min(1240px,calc(100% - 32px));margin:28px auto 56px;display:grid;gap:22px}
+        .student-hero,.student-card{background:var(--bg-card);border:1px solid var(--glass-border);border-radius:26px;box-shadow:var(--shadow-lg),var(--shadow-inner);position:relative;overflow:hidden}
+        .student-hero::before,.student-card::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.08),transparent 28%);pointer-events:none}
+        .student-hero,.student-card{padding:28px}
+        .student-hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr);gap:22px}
+        .student-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.85fr);gap:22px;align-items:start}
+        .student-badge{display:inline-flex;align-items:center;gap:10px;min-height:38px;padding:0 14px;border-radius:999px;background:rgba(98,227,255,.10);border:1px solid rgba(98,227,255,.18);font-weight:700;margin-bottom:16px}
+        .student-title{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.05;margin-bottom:12px}
+        .student-copy{color:var(--text-secondary);line-height:1.7}
+        .student-profile-head{display:flex;gap:16px;align-items:center}
+        .student-avatar{width:72px;height:72px;border-radius:22px;display:grid;place-items:center;background:var(--gradient-primary);color:#fff;font-size:1.5rem;box-shadow:0 18px 36px rgba(53,99,233,.18)}
+        .student-mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:22px}
+        .mini-stat{padding:16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+        body[data-theme="light"] .mini-stat{background:#e9edf2;border-color:rgba(198,205,216,.86)}
+        .mini-stat strong{display:block;font-size:1.45rem;margin-bottom:6px}
+        .student-card h3{margin-bottom:14px}
+        .student-card p.lead{color:var(--text-secondary);margin-bottom:16px}
+        .token-list{display:grid;gap:12px}
+        .token-item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+        body[data-theme="light"] .token-item{background:#e9edf2;border-color:rgba(198,205,216,.86)}
+        .token-meta{display:grid;gap:6px}
+        .token-meta strong{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+        .token-meta small{color:var(--text-secondary)}
+        .profile-form,.report-form{display:grid;gap:14px}
+        .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+        .profile-note,.status-note{color:var(--text-secondary);font-size:.94rem}
+        .status-badge{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border-radius:999px;font-weight:700;font-size:.82rem}
+        .status-pending{background:rgba(245,158,11,.15);color:#f59e0b}
+        .status-verified{background:rgba(59,130,246,.15);color:#3b82f6}
+        .status-progress{background:rgba(168,85,247,.15);color:#8b5cf6}
+        .status-resolved{background:rgba(34,197,94,.15);color:#22c55e}
+        .timeline{display:grid;gap:12px}
+        .timeline-item{padding:14px 16px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+        body[data-theme="light"] .timeline-item{background:#eef1f5;border-color:rgba(198,205,216,.86)}
+        .empty-box{padding:24px;border-radius:20px;border:1px dashed rgba(255,255,255,.12);text-align:center;color:var(--text-secondary)}
+        body[data-theme="light"] .empty-box{border-color:rgba(198,205,216,.86)}
+        @media (max-width:1000px){.student-hero,.student-grid,.form-grid,.student-mini-grid{grid-template-columns:1fr}}
     </style>
 </head>
-<body>
-    <header class="site-header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo-area">
-                    <a href="index.html">
-                        <h1 class="logo">CAMPUS <span>GOVERNANCE</span></h1>
-                        <span class="institution">DIU · Analytics Dashboard</span>
-                    </a>
-                </div>
-                <div class="header-actions">
-                    <div class="lang-toggle">
-                        <button class="lang-btn active" data-lang="en">EN</button>
-                        <button class="lang-btn" data-lang="bn">বাংলা</button>
+<body data-theme="dark">
+<div class="progress-container" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+<header class="site-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="logo-area">
+                <a href="index.html" class="logo-link">
+                    <div class="logo-icon"><i class="fas fa-user-graduate"></i></div>
+                    <div class="logo-text">
+                        <h1>STUDENT <span>PORTAL</span></h1>
+                        <span class="institution">Campus Governance System</span>
                     </div>
+                </a>
+            </div>
+            <div class="header-controls">
+                <div class="theme-toggle">
+                    <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme"><i class="fas fa-moon" id="themeIcon"></i></button>
+                </div>
+                <div class="auth-buttons">
+                    <a href="report.html" class="btn-outline"><i class="fas fa-pen-to-square"></i> Report Issue</a>
+                    <a href="track.html" class="btn-outline"><i class="fas fa-location-crosshairs"></i> Track Report</a>
+                    <a href="index.html" class="btn-primary"><i class="fas fa-house"></i> Home</a>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
+</header>
 
-    <main class="dashboard-page">
-        <h1>📊 Governance Analytics Dashboard</h1>
-        <p>Real-time insights and statistics for DIU Campus Governance</p>
-
-        <!-- Stats Grid - Will be filled by JavaScript -->
-        <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalReports">0</div>
-                <div class="stat-label">Total Reports</div>
-                <div class="stat-trend" id="totalTrend"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="resolvedReports">0</div>
-                <div class="stat-label">Resolved</div>
-                <div class="stat-trend" id="resolvedTrend"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="pendingReports">0</div>
-                <div class="stat-label">In Progress</div>
-                <div class="stat-trend" id="pendingTrend"></div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="avgResolution">0</div>
-                <div class="stat-label">Avg Days to Resolve</div>
-                <div class="stat-trend" id="avgTrend"></div>
+<main class="student-shell">
+    <section class="student-hero">
+        <div>
+            <div class="student-badge"><i class="fas fa-shield-heart"></i><span>Student workspace</span></div>
+            <h1 class="student-title">Submit reports, track progress, and manage your profile.</h1>
+            <p class="student-copy">This page is only for student users. Reports submitted from here go to the central report system and become visible in the admin panel for moderation and updates.</p>
+            <div class="student-mini-grid">
+                <div class="mini-stat"><strong id="statTracked">0</strong><span>Saved Tokens</span></div>
+                <div class="mini-stat"><strong id="statResolved">0</strong><span>Resolved</span></div>
+                <div class="mini-stat"><strong id="statPending">0</strong><span>Open / Review</span></div>
             </div>
         </div>
-
-        <!-- Charts -->
-        <div class="chart-grid">
-            <div class="chart-card">
-                <h3>Issues by Category</h3>
-                <canvas id="categoryChart"></canvas>
+        <div class="student-card" style="padding:22px">
+            <div class="student-profile-head">
+                <div class="student-avatar" id="studentAvatar"><i class="fas fa-user"></i></div>
+                <div>
+                    <h3 id="studentNameHeading">Student User</h3>
+                    <p class="profile-note" id="studentEmailHeading">student@university.edu</p>
+                    <span class="status-badge status-verified">Student Account</span>
+                </div>
             </div>
-            <div class="chart-card">
-                <h3>Issues by Department</h3>
-                <canvas id="departmentChart"></canvas>
-            </div>
+            <p class="profile-note" style="margin-top:16px">Your profile details are kept in the browser for now. Report data is still fetched live from the backend using your saved tracking tokens.</p>
         </div>
-    </main>
+    </section>
 
-    <script>
-        const API_BASE = 'http://localhost:8080/api';
+    <section class="student-grid">
+        <div style="display:grid;gap:22px">
+            <section class="student-card">
+                <h3>Student Profile</h3>
+                <p class="lead">Edit how your student portal looks and stores your contact details locally.</p>
+                <form id="profileForm" class="profile-form">
+                    <div class="form-grid">
+                        <div class="form-group"><label for="profileName">Full Name</label><input id="profileName" type="text" /></div>
+                        <div class="form-group"><label for="profileEmail">Email</label><input id="profileEmail" type="email" /></div>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group"><label for="profileDept">Department</label><input id="profileDept" type="text" /></div>
+                        <div class="form-group"><label for="profilePhone">Phone</label><input id="profilePhone" type="text" /></div>
+                    </div>
+                    <button type="submit" class="btn-primary"><i class="fas fa-floppy-disk"></i> Save Profile</button>
+                </form>
+            </section>
 
-        // Fetch real stats
-        async function fetchStats() {
-            try {
-                const response = await fetch(`${API_BASE}/stats`);
-                const data = await response.json();
-                
-                if (data.success) {
-                    document.getElementById('totalReports').textContent = data.data.total_reports || 0;
-                    document.getElementById('resolvedReports').textContent = data.data.resolved_reports || 0;
-                    document.getElementById('pendingReports').textContent = data.data.pending_reports || 0;
-                    
-                    // Calculate average resolution time (mock for now)
-                    const avgDays = data.data.resolved_reports > 0 ? 
-                        (Math.random() * 5 + 1).toFixed(1) : 0;
-                    document.getElementById('avgResolution').textContent = avgDays;
-                    
-                    // Update trends
-                    updateTrends(data.data);
-                }
-            } catch (error) {
-                console.error('Failed to fetch stats:', error);
-            }
+            <section class="student-card">
+                <h3>Submit a New Report</h3>
+                <p class="lead">This uses the live backend and creates a tracking token that admins can see from the admin panel.</p>
+                <form id="studentReportForm" class="report-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="studentCategory">Category</label>
+                            <select id="studentCategory" required>
+                                <option value="">Select category</option>
+                                <option value="academic">Academic</option>
+                                <option value="facility">Facility</option>
+                                <option value="transport">Transport</option>
+                                <option value="security">Security</option>
+                                <option value="harassment">Harassment</option>
+                                <option value="it">IT Services</option>
+                                <option value="admin">Administrative</option>
+                            </select>
+                        </div>
+                        <div class="form-group"><label for="studentLocation">Location</label><input id="studentLocation" type="text" maxlength="120" /></div>
+                    </div>
+                    <div class="form-group"><label for="studentTitle">Title</label><input id="studentTitle" type="text" maxlength="120" required /></div>
+                    <div class="form-group"><label for="studentDescription">Description</label><textarea id="studentDescription" rows="5" required></textarea></div>
+                    <button type="submit" class="btn-primary" id="studentSubmitBtn"><i class="fas fa-paper-plane"></i> Submit Report</button>
+                </form>
+                <div class="status-note" id="studentReportNote" style="margin-top:12px"></div>
+            </section>
+        </div>
+
+        <div style="display:grid;gap:22px">
+            <section class="student-card">
+                <h3>Saved Report Tokens</h3>
+                <p class="lead">Click any saved token to load the current status.</p>
+                <div id="savedTokenList" class="token-list"></div>
+            </section>
+
+            <section class="student-card">
+                <h3>Selected Report Status</h3>
+                <div id="selectedReportStatus" class="empty-box">Select a saved token to load the latest status and timeline.</div>
+            </section>
+        </div>
+    </section>
+</main>
+
+<div class="toast-container" id="toastContainer"></div>
+<script>
+const API_BASE = `${window.location.origin}/api`;
+let currentTheme = localStorage.getItem('cgs_theme') || 'dark';
+
+function getSessionUser(){try{return JSON.parse(sessionStorage.getItem('cgs_user')||'null')}catch{return null}}
+const sessionUser = getSessionUser();
+if(sessionUser && (sessionUser.role==='admin' || sessionUser.role==='faculty')){ window.location.replace('admin/dashboard.php'); }
+
+function setThemeIcon(theme){document.getElementById('themeIcon').className = theme === 'light' ? 'fas fa-sun' : 'fas fa-moon';}
+function loadTheme(){document.body.setAttribute('data-theme', currentTheme); setThemeIcon(currentTheme);}
+document.getElementById('themeToggle').addEventListener('click',()=>{currentTheme=currentTheme==='dark'?'light':'dark';localStorage.setItem('cgs_theme',currentTheme);loadTheme();});
+function showToast(message,type='success'){const c=document.getElementById('toastContainer'); const t=document.createElement('div'); t.className=`toast ${type}`; t.textContent=message; c.appendChild(t); requestAnimationFrame(()=>t.classList.add('show')); setTimeout(()=>{t.classList.remove('show'); setTimeout(()=>t.remove(),300)},3200);}
+function updateProgressBar(){const p=document.getElementById('progressBar');const st=document.documentElement.scrollTop||document.body.scrollTop;const sh=document.documentElement.scrollHeight-document.documentElement.clientHeight;p.style.width=`${sh>0?(st/sh)*100:0}%`;}
+window.addEventListener('scroll',updateProgressBar);
+
+function getStudentProfile(){
+    try {
+        const local = JSON.parse(localStorage.getItem('cgs_student_profile') || '{}');
+        const sessionUser = JSON.parse(sessionStorage.getItem('cgs_user') || 'null');
+        if (sessionUser && !(sessionUser.role==='admin' || sessionUser.role==='faculty')) {
+            return {
+                name: local.name || sessionUser.name || '',
+                email: local.email || sessionUser.email || '',
+                department: local.department || '',
+                phone: local.phone || ''
+            };
         }
+        return local;
+    } catch { return {}; }
+}
+function saveStudentProfile(data){
+    localStorage.setItem('cgs_student_profile', JSON.stringify(data));
+}
+function renderProfile(){
+    const profile = getStudentProfile();
+    document.getElementById('profileName').value = profile.name || '';
+    document.getElementById('profileEmail').value = profile.email || '';
+    document.getElementById('profileDept').value = profile.department || '';
+    document.getElementById('profilePhone').value = profile.phone || '';
+    document.getElementById('studentNameHeading').textContent = profile.name || 'Student User';
+    document.getElementById('studentEmailHeading').textContent = profile.email || 'student@university.edu';
+    document.getElementById('studentAvatar').innerHTML = `<span>${(profile.name || 'S').trim().charAt(0).toUpperCase()}</span>`;
+}
+document.getElementById('profileForm').addEventListener('submit', e => {
+    e.preventDefault();
+    saveStudentProfile({
+        name: document.getElementById('profileName').value.trim(),
+        email: document.getElementById('profileEmail').value.trim(),
+        department: document.getElementById('profileDept').value.trim(),
+        phone: document.getElementById('profilePhone').value.trim()
+    });
+    renderProfile();
+    showToast('Student profile saved.', 'success');
+});
 
-        function updateTrends(stats) {
-            document.getElementById('totalTrend').innerHTML = stats.total_reports > 0 ? 
-                '↑ ' + Math.floor(Math.random() * 20) + '% from last month' : '';
-            document.getElementById('resolvedTrend').innerHTML = stats.resolved_reports > 0 ? 
-                '↑ ' + Math.floor(Math.random() * 15) + '% from last month' : '';
-            document.getElementById('pendingTrend').innerHTML = stats.pending_reports > 0 ? 
-                '↓ ' + Math.floor(Math.random() * 10) + '% from last month' : '';
-        }
+function getSavedTokens(){
+    try { return JSON.parse(localStorage.getItem('cgs_tokens') || '[]'); } catch { return []; }
+}
+function saveToken(token){
+    const tokens = getSavedTokens();
+    const updated = [token, ...tokens.filter(t => t !== token)].slice(0, 10);
+    localStorage.setItem('cgs_tokens', JSON.stringify(updated));
+    renderSavedTokens();
+}
+function statusClass(status=''){
+    const s=String(status).toLowerCase();
+    if(s.includes('resolved')) return 'status-resolved';
+    if(s.includes('verified')) return 'status-verified';
+    if(s.includes('progress')||s.includes('assigned')) return 'status-progress';
+    return 'status-pending';
+}
+function prettyStatus(status=''){const s=String(status).replace(/_/g,' ').trim(); return s ? s.replace(/\b\w/g,c=>c.toUpperCase()) : 'Pending';}
+function renderSavedTokens(){
+    const tokens=getSavedTokens();
+    const wrap=document.getElementById('savedTokenList');
+    document.getElementById('statTracked').textContent = tokens.length;
+    if(!tokens.length){wrap.innerHTML=`<div class="empty-box">No saved tokens yet.</div>`; updateStudentStats([]); return;}
+    wrap.innerHTML=tokens.map(token=>`<button class="token-item" type="button" data-token="${token}"><div class="token-meta"><strong>${token}</strong><small>Click to load live report status</small></div><i class="fas fa-arrow-right"></i></button>`).join('');
+    wrap.querySelectorAll('[data-token]').forEach(btn=>btn.addEventListener('click',()=>loadReport(btn.dataset.token)));
+    Promise.all(tokens.slice(0,10).map(token=>fetch(`${API_BASE}/report/track?token=${encodeURIComponent(token)}`).then(r=>r.json()).catch(()=>null))).then(results=>{
+        const items = results.filter(x=>x?.success && x?.data).map(x=>x.data);
+        updateStudentStats(items);
+    });
+}
+function updateStudentStats(items){
+    const resolved = items.filter(x => String(x.status).toLowerCase().includes('resolved')).length;
+    const pending = items.filter(x => !String(x.status).toLowerCase().includes('resolved')).length;
+    document.getElementById('statResolved').textContent = resolved;
+    document.getElementById('statPending').textContent = pending;
+}
+async function loadReport(token){
+    const target=document.getElementById('selectedReportStatus');
+    target.innerHTML='Loading...';
+    try{
+        const response=await fetch(`${API_BASE}/report/track?token=${encodeURIComponent(token)}`);
+        const data=await response.json();
+        if(!response.ok || !data?.success || !data?.data){throw new Error(data?.message || 'Report not found');}
+        const report=data.data;
+        const timeline=(report.timeline||[]).map(item=>`<div class="timeline-item"><strong>${item.title || prettyStatus(item.status)}</strong><div class="profile-note">${item.note || item.description || 'Status updated.'}</div><small class="profile-note">${item.created_at || item.time || ''}</small></div>`).join('');
+        target.innerHTML = `<div style="display:grid;gap:12px">
+            <div><strong>${report.title || 'Untitled report'}</strong></div>
+            <div class="status-badge ${statusClass(report.status)}">${prettyStatus(report.status)}</div>
+            <div class="profile-note">${report.description || 'No description available.'}</div>
+            <div class="profile-note"><i class="fas fa-location-dot"></i> ${report.location || 'Not specified'}</div>
+            <div class="profile-note"><i class="fas fa-clock"></i> Last updated: ${report.updated_at || report.created_at || '—'}</div>
+            <div class="timeline">${timeline || '<div class="empty-box">No timeline available yet.</div>'}</div>
+        </div>`;
+    }catch(error){
+        target.innerHTML = `<div class="empty-box">${error.message || 'Unable to load report status.'}</div>`;
+    }
+}
 
-        // Fetch reports for charts
-        async function fetchReports() {
-            try {
-                const response = await fetch(`${API_BASE}/reports/all`);
-                const data = await response.json();
-                
-                if (data.success && data.data.length > 0) {
-                    updateCharts(data.data);
-                } else {
-                    // Show empty charts with sample data
-                    initEmptyCharts();
-                }
-            } catch (error) {
-                console.error('Failed to fetch reports:', error);
-                initEmptyCharts();
-            }
-        }
+document.getElementById('studentReportForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn=document.getElementById('studentSubmitBtn');
+    const note=document.getElementById('studentReportNote');
+    const category=document.getElementById('studentCategory').value;
+    const title=document.getElementById('studentTitle').value.trim();
+    const description=document.getElementById('studentDescription').value.trim();
+    const location=document.getElementById('studentLocation').value.trim();
+    if(!category || !title || !description){showToast('Please fill in all required report fields.','error'); return;}
+    const formData=new FormData();
+    formData.append('category',category);
+    formData.append('title',title);
+    formData.append('description',description);
+    formData.append('location',location);
+    const original=btn.innerHTML; btn.disabled=true; btn.innerHTML='<span class="loading-spinner"></span> Submitting...'; note.textContent='';
+    try{
+        const response=await fetch(`${API_BASE}/report/submit`,{method:'POST',body:formData});
+        const data=await response.json();
+        if(!response.ok || !data?.success || !data?.data?.token){throw new Error(data?.message || 'Submission failed');}
+        saveToken(data.data.token);
+        document.getElementById('studentReportForm').reset();
+        note.textContent = `Submitted successfully. Token: ${data.data.token}`;
+        showToast(`Report submitted. Token: ${data.data.token}`,'success');
+    }catch(error){
+        note.textContent = error.message || 'Submission failed.';
+        showToast(note.textContent,'error');
+    }finally{
+        btn.disabled=false; btn.innerHTML=original;
+    }
+});
 
-        function updateCharts(reports) {
-            // Count by category
-            const categories = {};
-            const departments = {};
-            
-            reports.forEach(r => {
-                const cat = r.category || 'other';
-                const dept = r.department || 'unassigned';
-                categories[cat] = (categories[cat] || 0) + 1;
-                departments[dept] = (departments[dept] || 0) + 1;
-            });
-
-            // Category Chart
-            new Chart(document.getElementById('categoryChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(categories),
-                    datasets: [{
-                        data: Object.values(categories),
-                        backgroundColor: ['#3b82f6', '#f97316', '#ef4444', '#10b981', '#8b5cf6']
-                    }]
-                }
-            });
-
-            // Department Chart
-            new Chart(document.getElementById('departmentChart'), {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(departments),
-                    datasets: [{
-                        label: 'Issues',
-                        data: Object.values(departments),
-                        backgroundColor: '#3b82f6'
-                    }]
-                }
-            });
-        }
-
-        function initEmptyCharts() {
-            new Chart(document.getElementById('categoryChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Academic', 'Facility', 'Security', 'IT', 'Other'],
-                    datasets: [{
-                        data: [0, 0, 0, 0, 1],
-                        backgroundColor: ['#3b82f6', '#f97316', '#ef4444', '#10b981', '#8b5cf6']
-                    }]
-                }
-            });
-
-            new Chart(document.getElementById('departmentChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['IT', 'FAC', 'ACAD', 'SEC'],
-                    datasets: [{
-                        label: 'Issues',
-                        data: [0, 0, 0, 0],
-                        backgroundColor: '#3b82f6'
-                    }]
-                }
-            });
-        }
-
-        // Load data
-        fetchStats();
-        fetchReports();
-        setInterval(fetchStats, 30000);
-    </script>
+loadTheme();
+renderProfile();
+renderSavedTokens();
+updateProgressBar();
+</script>
 </body>
 </html>
