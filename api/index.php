@@ -5,27 +5,36 @@ require_once __DIR__ . '/bootstrap.php';
 $db = cgs_db();
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+
 if (($frontendPos = strpos($path, '/frontend/')) !== false && str_starts_with($path, '/api/')) {
     $path = substr($path, 0, $frontendPos);
 }
+
 $path = rtrim($path, '/');
-if ($path === '') $path = '/';
+if ($path === '') {
+    $path = '/';
+}
 
 header('Access-Control-Allow-Origin: ' . ($_SERVER['HTTP_ORIGIN'] ?? '*'));
 header('Access-Control-Allow-Credentials: true');
 header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With');
 header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+
 if ($method === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
 if ($path === '/health') {
-    cgs_success(['status' => 'healthy', 'time' => date(DATE_RFC3339)]);
+    cgs_success([
+        'status' => 'healthy',
+        'time' => date(DATE_RFC3339),
+    ]);
 }
 
 if ($path === '/api/auth/register' && $method === 'POST') {
     $input = cgs_read_json();
+
     $username = strtolower(trim((string)($input['username'] ?? '')));
     $email = strtolower(trim((string)($input['email'] ?? '')));
     $password = (string)($input['password'] ?? '');
@@ -35,19 +44,45 @@ if ($path === '/api/auth/register' && $method === 'POST') {
     $departmentId = cgs_department_id_from_input($db, $input['department_id'] ?? null);
 
     $errors = [];
-    if (!preg_match('/^[a-zA-Z0-9._-]{3,50}$/', $username)) $errors['username'] = 'Username must be 3-50 characters and use only letters, numbers, dot, underscore, or dash.';
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors['email'] = 'Valid email is required.';
-    if (strlen($password) < 8) $errors['password'] = 'Password must be at least 8 characters.';
-    if (strlen($fullName) < 2) $errors['full_name'] = 'Full name is required.';
-    if (!in_array($role, ['admin', 'faculty', 'student', 'department_head'], true)) $errors['role'] = 'Invalid role.';
-    if ($errors) cgs_error('Validation failed', 400, $errors);
+    if (!preg_match('/^[a-zA-Z0-9._-]{3,50}$/', $username)) {
+        $errors['username'] = 'Username must be 3-50 characters and use only letters, numbers, dot, underscore, or dash.';
+    }
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors['email'] = 'Valid email is required.';
+    }
+    if (strlen($password) < 8) {
+        $errors['password'] = 'Password must be at least 8 characters.';
+    }
+    if (strlen($fullName) < 2) {
+        $errors['full_name'] = 'Full name is required.';
+    }
+    if (!in_array($role, ['admin', 'faculty', 'student', 'department_head'], true)) {
+        $errors['role'] = 'Invalid role.';
+    }
+    if ($errors) {
+        cgs_error('Validation failed', 400, $errors);
+    }
 
     $check = $db->prepare('SELECT id FROM users WHERE lower(username)=? OR lower(email)=? LIMIT 1');
     $check->execute([$username, $email]);
-    if ($check->fetch()) cgs_error('Username or email already exists', 409);
+    if ($check->fetch()) {
+        cgs_error('Username or email already exists', 409);
+    }
 
-    $stmt = $db->prepare('INSERT INTO users (username, email, password_hash, full_name, role, department_id, phone, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)');
-    $stmt->execute([$username, $email, password_hash($password, PASSWORD_DEFAULT), $fullName, $role, $departmentId, $phone !== '' ? $phone : null]);
+    $stmt = $db->prepare('
+        INSERT INTO users (username, email, password_hash, full_name, role, department_id, phone, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+    ');
+    $stmt->execute([
+        $username,
+        $email,
+        password_hash($password, PASSWORD_DEFAULT),
+        $fullName,
+        $role,
+        $departmentId,
+        $phone !== '' ? $phone : null,
+    ]);
+
     $userId = (int)$db->lastInsertId();
 
     cgs_refresh_stats($db);
@@ -65,18 +100,27 @@ if ($path === '/api/auth/register' && $method === 'POST') {
                 'role' => $role,
                 'department_id' => $departmentId,
                 'profile_image' => null,
-            ]
-        ]
+            ],
+        ],
     ], 201);
 }
 
 if ($path === '/api/auth/login' && $method === 'POST') {
     $input = cgs_read_json();
+
     $login = strtolower(trim((string)($input['login'] ?? '')));
     $password = (string)($input['password'] ?? '');
-    if ($login === '' || $password === '') cgs_error('Login and password are required', 400);
 
-    $stmt = $db->prepare('SELECT id, username, email, password_hash, full_name, role, department_id, profile_image, is_active FROM users WHERE lower(username)=? OR lower(email)=? LIMIT 1');
+    if ($login === '' || $password === '') {
+        cgs_error('Login and password are required', 400);
+    }
+
+    $stmt = $db->prepare('
+        SELECT id, username, email, password_hash, full_name, role, department_id, profile_image, is_active
+        FROM users
+        WHERE lower(username)=? OR lower(email)=?
+        LIMIT 1
+    ');
     $stmt->execute([$login, $login]);
     $user = $stmt->fetch();
 
@@ -100,7 +144,7 @@ if ($path === '/api/auth/login' && $method === 'POST') {
 
     $db->prepare('DELETE FROM sessions WHERE user_id = ?')->execute([(int)$user['id']]);
     cgs_make_session($db, (int)$user['id']);
-    $db->prepare('UPDATE users SET last_login=CURRENT_TIMESTAMP WHERE id = ?')->execute([(int)$user['id']]);
+    $db->prepare('UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?')->execute([(int)$user['id']]);
 
     cgs_success([
         'user' => [
@@ -111,7 +155,7 @@ if ($path === '/api/auth/login' && $method === 'POST') {
             'role' => $user['role'],
             'department_id' => $user['department_id'] !== null ? (int)$user['department_id'] : null,
             'profile_image' => $user['profile_image'] ?? null,
-        ]
+        ],
     ], 'Login successful');
 }
 
@@ -122,6 +166,7 @@ if ($path === '/api/auth/logout' && $method === 'POST') {
 
 if ($path === '/api/auth/me' && $method === 'GET') {
     $user = cgs_require_user($db);
+
     cgs_success([
         'id' => (int)$user['id'],
         'username' => $user['username'],
@@ -141,12 +186,14 @@ if ($path === '/api/profile/upload-image' && $method === 'POST') {
     }
 
     $file = $_FILES['profile_image'];
+
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
         cgs_error('Profile image upload failed', 400);
     }
 
     $maxSize = 5 * 1024 * 1024;
     $size = (int)($file['size'] ?? 0);
+
     if ($size <= 0) {
         cgs_error('Uploaded profile image is empty', 400);
     }
@@ -156,6 +203,7 @@ if ($path === '/api/profile/upload-image' && $method === 'POST') {
 
     $tmpName = (string)($file['tmp_name'] ?? '');
     $originalName = trim((string)($file['name'] ?? ''));
+
     if ($tmpName === '' || $originalName === '') {
         cgs_error('Invalid profile image upload', 400);
     }
@@ -192,6 +240,7 @@ if ($path === '/api/profile/upload-image' && $method === 'POST') {
     }
 
     $oldImage = $user['profile_image'] ?? null;
+
     $stmt = $db->prepare('UPDATE users SET profile_image = ? WHERE id = ?');
     $stmt->execute([$relativePath, (int)$user['id']]);
 
@@ -214,13 +263,16 @@ if ($path === '/api/stats' && $method === 'GET') {
 }
 
 if ($path === '/api/reports/latest' && $method === 'GET') {
-    $rows = $db->query("SELECT r.id, t.token, r.category, r.title, r.description, COALESCE(r.location,'') AS location, r.priority, r.status, r.created_at, r.updated_at
+    $rows = $db->query("
+        SELECT r.id, t.token, r.category, r.title, r.description, COALESCE(r.location,'') AS location,
+               r.priority, r.status, r.created_at, r.updated_at
         FROM reports r
         LEFT JOIN tokens t ON t.id = r.token_id
         ORDER BY datetime(r.created_at) DESC
-        LIMIT 8")->fetchAll() ?: [];
+        LIMIT 8
+    ")->fetchAll() ?: [];
 
-    cgs_success(array_map(static function (array $row): array {
+    cgs_success(array_map(static function(array $row): array {
         $row['id'] = (int)$row['id'];
         return $row;
     }, $rows));
@@ -247,7 +299,9 @@ if ($path === '/api/report/submit' && $method === 'POST') {
     if (strlen($title) < 5) $errors['title'] = 'Title must be at least 5 characters.';
     if (strlen($description) < 10) $errors['description'] = 'Description must be at least 10 characters.';
     if (!in_array($priority, ['low', 'medium', 'high', 'critical'], true)) $errors['priority'] = 'Priority is invalid.';
-    if ($errors) cgs_error('Validation failed', 400, $errors);
+    if ($errors) {
+        cgs_error('Validation failed', 400, $errors);
+    }
 
     $currentUser = cgs_current_user($db);
     $tokenValue = cgs_generate_tracking_token($db);
@@ -255,25 +309,33 @@ if ($path === '/api/report/submit' && $method === 'POST') {
     $db->beginTransaction();
     try {
         $db->prepare('INSERT INTO tokens (token, email, phone, is_active) VALUES (?, ?, ?, 1)')
-            ->execute([$tokenValue, $notifyEmail !== '' ? $notifyEmail : null, $notifyPhone !== '' ? $notifyPhone : null]);
+            ->execute([
+                $tokenValue,
+                $notifyEmail !== '' ? $notifyEmail : null,
+                $notifyPhone !== '' ? $notifyPhone : null,
+            ]);
 
         $tokenId = (int)$db->lastInsertId();
 
-        $db->prepare('INSERT INTO reports (token_id, user_id, department_id, category, title, description, location, priority, status, is_anonymous, notify_email, notify_phone) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-            ->execute([
-                $tokenId,
-                $currentUser['id'] ?? null,
-                $departmentId,
-                $category,
-                $title,
-                $description,
-                $location !== '' ? $location : null,
-                $priority,
-                'pending',
-                $isAnonymous,
-                $notifyEmail !== '' ? $notifyEmail : null,
-                $notifyPhone !== '' ? $notifyPhone : null
-            ]);
+        $db->prepare('
+            INSERT INTO reports (
+                token_id, user_id, department_id, category, title, description,
+                location, priority, status, is_anonymous, notify_email, notify_phone
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ')->execute([
+            $tokenId,
+            $currentUser['id'] ?? null,
+            $departmentId,
+            $category,
+            $title,
+            $description,
+            $location !== '' ? $location : null,
+            $priority,
+            'pending',
+            $isAnonymous,
+            $notifyEmail !== '' ? $notifyEmail : null,
+            $notifyPhone !== '' ? $notifyPhone : null,
+        ]);
 
         $reportId = (int)$db->lastInsertId();
 
@@ -290,29 +352,38 @@ if ($path === '/api/report/submit' && $method === 'POST') {
     }
 
     cgs_refresh_stats($db);
+
     cgs_json([
         'success' => true,
         'message' => 'Report submitted',
         'data' => [
             'report_id' => $reportId,
-            'token' => $tokenValue
-        ]
+            'token' => $tokenValue,
+        ],
     ], 201);
 }
 
 if ($path === '/api/report/track' && $method === 'GET') {
     $token = trim((string)($_GET['token'] ?? ''));
-    if ($token === '') cgs_error('Token is required', 400);
+    if ($token === '') {
+        cgs_error('Token is required', 400);
+    }
 
-    $stmt = $db->prepare("SELECT r.id, t.token, r.category, r.title, r.description, COALESCE(r.location,'') AS location, r.priority, r.status, r.created_at, r.updated_at, COALESCE(r.resolution_notes,'') AS resolution_notes
+    $stmt = $db->prepare("
+        SELECT r.id, t.token, r.category, r.title, r.description, COALESCE(r.location,'') AS location,
+               r.priority, r.status, r.created_at, r.updated_at,
+               COALESCE(r.resolution_notes,'') AS resolution_notes
         FROM reports r
         JOIN tokens t ON t.id = r.token_id
         WHERE t.token = ?
-        LIMIT 1");
+        LIMIT 1
+    ");
     $stmt->execute([$token]);
     $report = $stmt->fetch();
 
-    if (!$report) cgs_error('Report not found', 404);
+    if (!$report) {
+        cgs_error('Report not found', 404);
+    }
 
     $report['id'] = (int)$report['id'];
     $report['timeline'] = cgs_timeline($db, (int)$report['id']);
@@ -322,13 +393,18 @@ if ($path === '/api/report/track' && $method === 'GET') {
 if ($path === '/api/report/date-counts' && $method === 'GET') {
     $year = preg_replace('/[^0-9]/', '', (string)($_GET['year'] ?? ''));
     $month = preg_replace('/[^0-9]/', '', (string)($_GET['month'] ?? ''));
-    if ($year === '' || $month === '') cgs_error('year and month are required', 400);
 
-    $stmt = $db->prepare("SELECT date(created_at) AS report_date, COUNT(*) AS report_count
+    if ($year === '' || $month === '') {
+        cgs_error('year and month are required', 400);
+    }
+
+    $stmt = $db->prepare("
+        SELECT date(created_at) AS report_date, COUNT(*) AS report_count
         FROM reports
         WHERE strftime('%Y', created_at) = ? AND strftime('%m', created_at) = ?
         GROUP BY date(created_at)
-        ORDER BY date(created_at)");
+        ORDER BY date(created_at)
+    ");
     $stmt->execute([$year, str_pad($month, 2, '0', STR_PAD_LEFT)]);
 
     $out = [];
@@ -343,29 +419,43 @@ if ($path === '/api/public/analytics' && $method === 'GET') {
 
     $stats = $db->query('SELECT * FROM stats WHERE id = 1')->fetch() ?: [];
     $statusRows = $db->query("SELECT status, COUNT(*) AS total FROM reports GROUP BY status ORDER BY total DESC")->fetchAll() ?: [];
-    $statusCounts = ['pending' => 0, 'verified' => 0, 'in_progress' => 0, 'resolved' => 0];
+    $statusCounts = [
+        'pending' => 0,
+        'verified' => 0,
+        'in_progress' => 0,
+        'resolved' => 0,
+    ];
 
     foreach ($statusRows as $row) {
         $statusCounts[(string)$row['status']] = (int)$row['total'];
     }
 
     $categoryRows = $db->query("SELECT category, COUNT(*) AS total FROM reports GROUP BY category ORDER BY total DESC, category ASC")->fetchAll() ?: [];
-    $recentReports = $db->query("SELECT r.title, r.category, COALESCE(r.location,'') AS location, r.status, r.created_at
+    $recentReports = $db->query("
+        SELECT r.title, r.category, COALESCE(r.location,'') AS location, r.status, r.created_at
         FROM reports r
         ORDER BY datetime(r.created_at) DESC
-        LIMIT 6")->fetchAll() ?: [];
-    $monthlyRows = $db->query("SELECT strftime('%Y-%m', created_at) AS ym, COUNT(*) AS total
+        LIMIT 6
+    ")->fetchAll() ?: [];
+
+    $monthlyRows = $db->query("
+        SELECT strftime('%Y-%m', created_at) AS ym, COUNT(*) AS total
         FROM reports
         WHERE datetime(created_at) >= datetime('now','start of month','-5 months')
         GROUP BY strftime('%Y-%m', created_at)
-        ORDER BY ym ASC")->fetchAll() ?: [];
+        ORDER BY ym ASC
+    ")->fetchAll() ?: [];
 
     $monthlyCounts = [];
     $cursor = new DateTimeImmutable('first day of -5 months');
     for ($i = 0; $i < 6; $i++) {
         $key = $cursor->format('Y-m');
         $label = $cursor->format('M Y');
-        $monthlyCounts[$key] = ['key' => $key, 'label' => $label, 'total' => 0];
+        $monthlyCounts[$key] = [
+            'key' => $key,
+            'label' => $label,
+            'total' => 0,
+        ];
         $cursor = $cursor->modify('+1 month');
     }
 
@@ -379,14 +469,14 @@ if ($path === '/api/public/analytics' && $method === 'GET') {
     cgs_success([
         'stats' => $stats,
         'status_counts' => $statusCounts,
-        'category_counts' => array_map(static function (array $row): array {
+        'category_counts' => array_map(static function(array $row): array {
             return [
                 'category' => (string)$row['category'],
-                'total' => (int)$row['total']
+                'total' => (int)$row['total'],
             ];
         }, $categoryRows),
         'monthly_counts' => array_values($monthlyCounts),
-        'recent_reports' => array_map(static function (array $row): array {
+        'recent_reports' => array_map(static function(array $row): array {
             return [
                 'title' => (string)$row['title'],
                 'category' => (string)$row['category'],

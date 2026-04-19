@@ -321,10 +321,9 @@ $csrfToken = admin_create_csrf_token();
                                             <th>Category</th>
                                             <th>Priority</th>
                                             <th>Status</th>
-                                            <th>Location</th>
+                                            <th>Summary</th>
                                             <th>Media</th>
                                             <th>Spam</th>
-                                            <th>Open</th>
                                         </tr>
                                     </thead>
                                     <tbody>

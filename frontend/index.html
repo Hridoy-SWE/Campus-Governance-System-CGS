@@ -1030,5 +1030,48 @@
             setInterval(fetchLatestReports, 30000);
         });
     </script>
+
+    <div class="cgs-chatbot-shell" id="chatbotShell" aria-live="polite">
+        <button class="cgs-chatbot-toggle" id="chatbotToggle" type="button" aria-label="Open help assistant">
+            <i class="fas fa-comments"></i>
+            <span class="chatbot-toggle-label">Help</span>
+        </button>
+
+        <section class="cgs-chatbot-panel" id="chatbotPanel" aria-hidden="true">
+            <div class="cgs-chatbot-header">
+                <div>
+                    <h3>Campus Help Assistant</h3>
+                    <p>Quick guidance for reporting, tracking, login, and analytics.</p>
+                </div>
+                <button class="cgs-chatbot-close" id="chatbotClose" type="button" aria-label="Close help assistant">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="cgs-chatbot-body" id="chatbotMessages">
+                <div class="cgs-chatbot-msg bot">
+                    <div class="cgs-chatbot-bubble">
+                        Hello. I can help with report submission, token tracking, login help, upload rules, and public analytics.
+                    </div>
+                </div>
+            </div>
+
+            <div class="cgs-chatbot-quick-actions">
+                <button type="button" class="cgs-chatbot-chip" data-chatbot-question="How do I submit a report?">Submit report</button>
+                <button type="button" class="cgs-chatbot-chip" data-chatbot-question="How do I track my token?">Track token</button>
+                <button type="button" class="cgs-chatbot-chip" data-chatbot-question="What files can I upload?">Upload rules</button>
+                <button type="button" class="cgs-chatbot-chip" data-chatbot-question="How does public analytics work?">Public analytics</button>
+            </div>
+
+            <form class="cgs-chatbot-form" id="chatbotForm">
+                <input type="text" id="chatbotInput" maxlength="220" placeholder="Ask about reports, tokens, login, uploads..." autocomplete="off">
+                <button type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </section>
+    </div>
+
+    <script src="js/main.js"></script>
 </body>
 </html>

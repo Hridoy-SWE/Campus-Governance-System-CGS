@@ -12,11 +12,14 @@ define('CGS_UPLOAD_DIR', CGS_ROOT . '/backend/uploads');
 
 function cgs_db(): PDO {
     static $pdo = null;
-    if ($pdo instanceof PDO) return $pdo;
+    if ($pdo instanceof PDO) {
+        return $pdo;
+    }
 
     if (!is_dir(dirname(CGS_DB_PATH))) {
         mkdir(dirname(CGS_DB_PATH), 0777, true);
     }
+
     if (!is_dir(CGS_UPLOAD_DIR)) {
         mkdir(CGS_UPLOAD_DIR, 0777, true);
     }
@@ -25,6 +28,7 @@ function cgs_db(): PDO {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
+
     $pdo->exec('PRAGMA foreign_keys = ON;');
     $pdo->exec('PRAGMA busy_timeout = 5000;');
 
@@ -34,25 +38,34 @@ function cgs_db(): PDO {
 
 function cgs_initialize_database(PDO $db): void {
     static $initialized = false;
-    if ($initialized) return;
+    if ($initialized) {
+        return;
+    }
     $initialized = true;
 
-    $db->exec(file_get_contents(CGS_SCHEMA_PATH));
+    $schemaSql = file_get_contents(CGS_SCHEMA_PATH);
+    if ($schemaSql === false) {
+        throw new RuntimeException('Failed to read database schema.');
+    }
+    $db->exec($schemaSql);
 
+    // Ensure profile_image column exists for API/profile consistency.
     try {
         $columns = $db->query("PRAGMA table_info(users)")->fetchAll() ?: [];
         $hasProfileImage = false;
+
         foreach ($columns as $column) {
             if (($column['name'] ?? '') === 'profile_image') {
                 $hasProfileImage = true;
                 break;
             }
         }
+
         if (!$hasProfileImage) {
             $db->exec("ALTER TABLE users ADD COLUMN profile_image TEXT");
         }
     } catch (Throwable $e) {
-        // Leave DB usable even if column already exists or migration fails silently on some setups.
+        // Keep project usable even if migration cannot run on an already-modified DB.
     }
 
     $count = (int)$db->query('SELECT COUNT(*) FROM departments')->fetchColumn();
@@ -81,8 +94,15 @@ function cgs_initialize_database(PDO $db): void {
     ];
 
     $findUser = $db->prepare('SELECT id FROM users WHERE lower(email) = lower(?) OR lower(username) = lower(?) LIMIT 1');
-    $insertUser = $db->prepare('INSERT INTO users (username, email, password_hash, full_name, role, department_id, phone, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)');
-    $updateUser = $db->prepare('UPDATE users SET username = ?, email = ?, password_hash = ?, full_name = ?, role = ?, department_id = ?, phone = ?, is_active = 1 WHERE id = ?');
+    $insertUser = $db->prepare('
+        INSERT INTO users (username, email, password_hash, full_name, role, department_id, phone, is_active)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+    ');
+    $updateUser = $db->prepare('
+        UPDATE users
+        SET username = ?, email = ?, password_hash = ?, full_name = ?, role = ?, department_id = ?, phone = ?, is_active = 1
+        WHERE id = ?
+    ');
 
     foreach ($users as [$username, $email, $name, $role, $departmentId, $phone, $plainPassword]) {
         $findUser->execute([$email, $username]);
@@ -90,9 +110,26 @@ function cgs_initialize_database(PDO $db): void {
         $passwordHash = password_hash($plainPassword, PASSWORD_DEFAULT);
 
         if ($existingId) {
-            $updateUser->execute([$username, $email, $passwordHash, $name, $role, $departmentId, $phone, (int)$existingId]);
+            $updateUser->execute([
+                $username,
+                $email,
+                $passwordHash,
+                $name,
+                $role,
+                $departmentId,
+                $phone,
+                (int)$existingId
+            ]);
         } else {
-            $insertUser->execute([$username, $email, $passwordHash, $name, $role, $departmentId, $phone]);
+            $insertUser->execute([
+                $username,
+                $email,
+                $passwordHash,
+                $name,
+                $role,
+                $departmentId,
+                $phone
+            ]);
         }
     }
 
@@ -102,7 +139,11 @@ function cgs_initialize_database(PDO $db): void {
         ['blocked_keywords', 'keyword', 'spam scam fraud test', 30],
         ['empty_or_short_content', 'length', 'min_20', 15],
     ];
-    $insertRule = $db->prepare('INSERT OR IGNORE INTO spam_rules (rule_name, rule_type, rule_value, score, is_active) VALUES (?, ?, ?, ?, 1)');
+
+    $insertRule = $db->prepare('
+        INSERT OR IGNORE INTO spam_rules (rule_name, rule_type, rule_value, score, is_active)
+        VALUES (?, ?, ?, ?, 1)
+    ');
     foreach ($rules as $rule) {
         $insertRule->execute($rule);
     }
@@ -114,8 +155,17 @@ function cgs_initialize_database(PDO $db): void {
         $deptId = $deptMap['CSE'] ?? null;
 
         $tokenInsert = $db->prepare('INSERT INTO tokens (token, email, phone, is_active) VALUES (?, ?, ?, 1)');
-        $reportInsert = $db->prepare('INSERT INTO reports (token_id, user_id, department_id, category, title, description, location, priority, status, assigned_to, is_anonymous, notify_email, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $historyInsert = $db->prepare('INSERT INTO report_status_history (report_id, old_status, new_status, changed_by, note, created_at) VALUES (?, ?, ?, ?, ?, ?)');
+        $reportInsert = $db->prepare('
+            INSERT INTO reports (
+                token_id, user_id, department_id, category, title, description,
+                location, priority, status, assigned_to, is_anonymous, notify_email,
+                created_at, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ');
+        $historyInsert = $db->prepare('
+            INSERT INTO report_status_history (report_id, old_status, new_status, changed_by, note, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ');
 
         $seedReports = [
             ['CGS-DEMO-0001', 'student@university.edu', '+8801700000003', 'Facility', 'Broken classroom projector', 'Projector in room CSE-402 is not working during lectures.', 'CSE Building Room 402', 'high', 'pending', null, 0, '2026-04-17 10:00:00'],
@@ -127,12 +177,43 @@ function cgs_initialize_database(PDO $db): void {
             $tokenInsert->execute([$token, $email, $phone]);
             $tokenId = (int)$db->lastInsertId();
 
-            $reportInsert->execute([$tokenId, $studentId ?: null, $deptId, $category, $title, $description, $location, $priority, $status, $assignedTo, $anon, $email, $createdAt, $createdAt]);
+            $reportInsert->execute([
+                $tokenId,
+                $studentId ?: null,
+                $deptId,
+                $category,
+                $title,
+                $description,
+                $location,
+                $priority,
+                $status,
+                $assignedTo,
+                $anon,
+                $email,
+                $createdAt,
+                $createdAt
+            ]);
+
             $reportId = (int)$db->lastInsertId();
 
-            $historyInsert->execute([$reportId, null, 'pending', $studentId ?: null, 'Report submitted', $createdAt]);
+            $historyInsert->execute([
+                $reportId,
+                null,
+                'pending',
+                $studentId ?: null,
+                'Report submitted',
+                $createdAt
+            ]);
+
             if ($status !== 'pending') {
-                $historyInsert->execute([$reportId, 'pending', $status, $facultyId ?: null, 'Updated by administration', date('Y-m-d H:i:s', strtotime($createdAt . ' +6 hours'))]);
+                $historyInsert->execute([
+                    $reportId,
+                    'pending',
+                    $status,
+                    $facultyId ?: null,
+                    'Updated by administration',
+                    date('Y-m-d H:i:s', strtotime($createdAt . ' +6 hours'))
+                ]);
             }
         }
     }
@@ -167,48 +248,68 @@ function cgs_json(array $payload, int $status = 200): void {
 
 function cgs_success($data = null, string $message = ''): void {
     $payload = ['success' => true];
-    if ($message !== '') $payload['message'] = $message;
-    if ($data !== null) $payload['data'] = $data;
+    if ($message !== '') {
+        $payload['message'] = $message;
+    }
+    if ($data !== null) {
+        $payload['data'] = $data;
+    }
     cgs_json($payload, 200);
 }
 
 function cgs_error(string $message, int $status = 400, $errors = null): void {
     $payload = ['success' => false, 'message' => $message];
-    if ($errors !== null) $payload['errors'] = $errors;
+    if ($errors !== null) {
+        $payload['errors'] = $errors;
+    }
     cgs_json($payload, $status);
 }
 
 function cgs_read_json(): array {
     $raw = file_get_contents('php://input');
-    if ($raw === false || trim($raw) === '') return [];
+    if ($raw === false || trim($raw) === '') {
+        return [];
+    }
 
     $data = json_decode($raw, true);
     if (!is_array($data)) {
         cgs_error('Invalid JSON body', 400);
     }
+
     return $data;
 }
 
 function cgs_current_user(?PDO $db = null): ?array {
     $db = $db ?: cgs_db();
     $token = trim((string)($_COOKIE['cgs_session'] ?? ''));
-    if ($token === '') return null;
 
-    $stmt = $db->prepare("SELECT u.id, u.username, u.email, u.full_name, u.role, u.department_id, u.profile_image, u.is_active
+    if ($token === '') {
+        return null;
+    }
+
+    $stmt = $db->prepare("
+        SELECT u.id, u.username, u.email, u.full_name, u.role, u.department_id, u.profile_image, u.is_active
         FROM sessions s
         JOIN users u ON u.id = s.user_id
-        WHERE s.session_token = :token AND datetime(s.expires_at) > datetime('now')
-        LIMIT 1");
+        WHERE s.session_token = :token
+          AND datetime(s.expires_at) > datetime('now')
+        LIMIT 1
+    ");
     $stmt->execute([':token' => $token]);
 
     $user = $stmt->fetch();
-    if (!$user || (int)$user['is_active'] !== 1) return null;
+    if (!$user || (int)$user['is_active'] !== 1) {
+        return null;
+    }
+
     return $user;
 }
 
 function cgs_require_user(?PDO $db = null): array {
     $user = cgs_current_user($db);
-    if (!$user) cgs_error('Authentication required', 401);
+    if (!$user) {
+        cgs_error('Authentication required', 401);
+    }
     return $user;
 }
 
@@ -216,8 +317,17 @@ function cgs_make_session(PDO $db, int $userId): string {
     $token = bin2hex(random_bytes(32));
     $expiresAt = date('Y-m-d H:i:s', time() + 86400);
 
-    $stmt = $db->prepare('INSERT INTO sessions (user_id, session_token, ip_address, user_agent, expires_at) VALUES (?, ?, ?, ?, ?)');
-    $stmt->execute([$userId, $token, $_SERVER['REMOTE_ADDR'] ?? '', $_SERVER['HTTP_USER_AGENT'] ?? '', $expiresAt]);
+    $stmt = $db->prepare('
+        INSERT INTO sessions (user_id, session_token, ip_address, user_agent, expires_at)
+        VALUES (?, ?, ?, ?, ?)
+    ');
+    $stmt->execute([
+        $userId,
+        $token,
+        $_SERVER['REMOTE_ADDR'] ?? '',
+        $_SERVER['HTTP_USER_AGENT'] ?? '',
+        $expiresAt
+    ]);
 
     setcookie('cgs_session', $token, [
         'expires' => time() + 86400,
@@ -239,8 +349,13 @@ function cgs_clear_session(PDO $db): void {
 }
 
 function cgs_department_id_from_input(PDO $db, $value): ?int {
-    if ($value === null || $value === '') return null;
-    if (is_numeric($value)) return (int)$value;
+    if ($value === null || $value === '') {
+        return null;
+    }
+
+    if (is_numeric($value)) {
+        return (int)$value;
+    }
 
     $stmt = $db->prepare('SELECT id FROM departments WHERE lower(name)=lower(?) OR lower(code)=lower(?) LIMIT 1');
     $stmt->execute([(string)$value, (string)$value]);
@@ -257,13 +372,37 @@ function cgs_upsert_demo_user(PDO $db, string $username, string $email, string $
     $hash = password_hash($plainPassword, PASSWORD_DEFAULT);
 
     if ($row) {
-        $db->prepare('UPDATE users SET username=?, email=?, password_hash=?, full_name=?, role=?, department_id=?, phone=?, is_active=1 WHERE id=?')
-            ->execute([$username, $email, $hash, $fullName, $role, $departmentId, $phone, (int)$row['id']]);
+        $db->prepare('
+            UPDATE users
+            SET username=?, email=?, password_hash=?, full_name=?, role=?, department_id=?, phone=?, is_active=1
+            WHERE id=?
+        ')->execute([
+            $username,
+            $email,
+            $hash,
+            $fullName,
+            $role,
+            $departmentId,
+            $phone,
+            (int)$row['id']
+        ]);
+
         $userId = (int)$row['id'];
         $profileImage = $row['profile_image'] ?? null;
     } else {
-        $db->prepare('INSERT INTO users (username, email, password_hash, full_name, role, department_id, phone, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, 1)')
-            ->execute([$username, $email, $hash, $fullName, $role, $departmentId, $phone]);
+        $db->prepare('
+            INSERT INTO users (username, email, password_hash, full_name, role, department_id, phone, is_active)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+        ')->execute([
+            $username,
+            $email,
+            $hash,
+            $fullName,
+            $role,
+            $departmentId,
+            $phone
+        ]);
+
         $userId = (int)$db->lastInsertId();
         $profileImage = null;
     }
@@ -432,11 +571,13 @@ function cgs_store_uploads(PDO $db, int $reportId): void {
 }
 
 function cgs_timeline(PDO $db, int $reportId): array {
-    $stmt = $db->prepare("SELECT h.id, h.old_status, h.new_status, h.note, h.created_at, COALESCE(u.full_name, 'System') AS changed_by_name
+    $stmt = $db->prepare("
+        SELECT h.id, h.old_status, h.new_status, h.note, h.created_at, COALESCE(u.full_name, 'System') AS changed_by_name
         FROM report_status_history h
         LEFT JOIN users u ON u.id = h.changed_by
         WHERE h.report_id = ?
-        ORDER BY datetime(h.created_at) ASC, h.id ASC");
+        ORDER BY datetime(h.created_at) ASC, h.id ASC
+    ");
     $stmt->execute([$reportId]);
     return $stmt->fetchAll() ?: [];
 }

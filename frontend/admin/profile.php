@@ -48,13 +48,14 @@ if (admin_is_post()) {
             admin_redirect('profile.php');
         }
 
-        if (!empty($_FILES['profile_photo']['name'])) {
-            $storedPhoto = backend_profile_store_photo($_FILES['profile_photo']);
+        if (!empty($_FILES['profile_image']['name'])) {
+            $storedPhoto = backend_profile_store_photo($_FILES['profile_image']);
             if ($storedPhoto === null) {
                 admin_set_flash('error', 'Invalid image upload. Allowed: JPG, PNG, WEBP.');
                 admin_redirect('profile.php');
             }
-            $payload['profile_photo'] = $storedPhoto;
+
+            $payload['profile_image'] = $storedPhoto;
             $_SESSION['admin_user_photo'] = $storedPhoto;
         }
 
@@ -62,6 +63,10 @@ if (admin_is_post()) {
             $_SESSION['admin_user_name'] = $payload['name'];
             $_SESSION['admin_user_email'] = $payload['email'];
             $_SESSION['admin_user_department'] = $payload['department'] !== '' ? $payload['department'] : ($_SESSION['admin_user_department'] ?? 'Administration');
+
+            if (!empty($payload['profile_image'])) {
+                $_SESSION['admin_user_photo'] = $payload['profile_image'];
+            }
 
             admin_set_flash('success', 'Profile updated successfully.');
         } else {
@@ -93,6 +98,7 @@ if (admin_is_post()) {
 }
 
 $profile = backend_profile_get($userId);
+$profileImage = $profile['profile_image'] ?? ($profile['profile_photo'] ?? '');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -162,8 +168,8 @@ $profile = backend_profile_get($userId);
                 <aside class="admin-panel-v2">
                     <div class="profile-identity-card-v2">
                         <div class="profile-identity-avatar-v2">
-                            <?php if (!empty($profile['profile_photo'])): ?>
-                                <img src="<?php echo admin_h($profile['profile_photo']); ?>" alt="Profile Photo">
+                            <?php if (!empty($profileImage)): ?>
+                                <img src="<?php echo admin_h($profileImage); ?>" alt="Profile Photo">
                             <?php else: ?>
                                 <i class="fas fa-user-shield"></i>
                             <?php endif; ?>
@@ -234,7 +240,7 @@ $profile = backend_profile_get($userId);
                             </div>
                             <div>
                                 <label>Profile Photo</label>
-                                <input type="file" name="profile_photo" accept=".jpg,.jpeg,.png,.webp">
+                                <input type="file" name="profile_image" accept=".jpg,.jpeg,.png,.webp">
                                 <div class="field-help-v2">Allowed: JPG, PNG, WEBP</div>
                             </div>
                         </div>
